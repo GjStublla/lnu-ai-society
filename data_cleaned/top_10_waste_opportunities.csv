@@ -1,0 +1,11 @@
+Rank,Flat_ID,Appliance,Issue_Type,Scope,4W_Avoided_kWh,4W_Shifted_kWh,4W_Spot_SEK,4W_Full_SEK,4W_Carbon_kg,Confidence
+1,F007,A07: Portable Electric Heater,Overheating & Fuel Switching (District Heat),Flat F007 (4 residents),342.9,0.0,155.4,527.8,12.06,High (r = -0.98 outdoor temp; indoor 22.5°C avg)
+2,F001,A07: Portable Electric Heater,Avoidable Electric Heating (District Heat),Flat F001 (2 residents),297.6,0.0,124.9,445.6,10.14,High (67.4% of flat load; r = -0.88 outdoor)
+3,All Flats,A02: Dishwasher / Washing Machine,Peak Load Shifting to Night (01-05 UTC),All 8 Flats (25 residents),0.0,295.0,162.5,203.1,5.44,High (384 cycles run at peak hours; 73% spot savings)
+4,F005,A06: Workstation / Desktop / Server,24/7 Idle Power / Standby (150W continuous),Flat F005 (5 residents),70.6,0.0,34.3,111.5,2.65,High (3.3x higher baseload than cohort)
+5,F007,A07: Portable Electric Heater,Heating Empty Apartment (56 unocc hrs),Flat F007 (4 residents),23.9,0.0,15.9,43.2,1.01,High (direct correlation with sensor-verified absence)
+6,F002,A01: Refrigerator / Freezer,Degraded Appliance / Seal Failure / Overcooling,Flat F002 (3 residents),24.9,0.0,12.2,39.5,0.84,Medium-High (86.8W continuous vs 52.5W cohort)
+7,All Flats,A05: Lighting & Media Standby,Nighttime Vampire Standby (01-05 UTC),All 8 Flats (25 residents),56.4,0.0,22.2,82.6,1.93,Medium (requires smart plug or habit intervention)
+8,F001,A07: Portable Electric Heater,Overnight Heating (744W all night),Flat F001 (2 residents),52.1,0.0,19.6,75.1,1.71,High (sleep hygiene setback to 18°C)
+9,Cohort,A03/A04: Oven / Hob / Kitchen,Unattended High-Power Cooking / Fire Risk,"Flats F001, F007, F008",37.0,0.0,33.0,77.2,1.68,Medium (safety hazard vs slow cooker ambiguity)
+10,F004,A05: Lighting & Entertainment,Lights Left ON in Empty Apartment (152 hrs),Flat F004 (2 residents),5.9,0.0,2.3,8.6,0.2,High (41.6W vs 4.0W cohort unoccupied baseline)

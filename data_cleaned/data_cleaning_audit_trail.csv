@@ -1,0 +1,15 @@
+Category,Affected Records,Description,Treatment & Justification
+Flats Validation,8,8 flat records validated,"Retained as source of truth for residents, area, tariff and price area."
+Prices Null Imputation,8,8 hourly spot prices were NaN,Imputed via linear interpolation from adjacent hours; prices exhibit high temporal autocorrelation.
+Prices Negative Values,13,13 negative spot prices in SE3 (min -0.1545 SEK/kWh),Retained as valid physical market reality (excess wind/hydro in Nordic power grid).
+Weather Sensor Sentinel,20,20 records with outdoor_temp_c == -99.0,Imputed from the other 7 flats at the exact same UTC timestamp where outdoor temperature is identical.
+Occupancy Sensor Sentinel & Nulls,97,12 sentinel values (9.0) and 85 nulls,"Replaced 9.0 with NaN, then imputed via flat-specific day-of-week and hour-of-day median to preserve diurnal occupancy patterns."
+Comma Decimal Notation,100,"100 records with European comma decimals (e.g. 0,053)",Replaced comma with dot and converted to standard float64.
+Cross-Flat Appliance Misassignment,24,24 records with mismatched flat_id and appliance prefix,Reassigned flat_id to match appliance prefix; verified they perfectly plug missing slots in destination flats.
+Corrupt F999 Appliance IDs,12,12 records with non-existent appliance F999-A01,Mapped to exact missing appliance channel for reported flat at that hour via grid reconciliation.
+Explicit Wh Unit Normalization,141,141 records reported in Wh (e.g. 128.0 Wh),Divided by 1000.0 to convert to canonical kWh and standardized unit label to kWh.
+Mislabeled Wh Spikes (>2 kWh),26,26 records with implausible spike values 10.7 - 44.8 kWh (labeled as kWh),"Divided by 1000.0; values are raw Wh readings mislabeled as kWh, perfectly matching normal appliance baseline when converted."
+Negative Energy Readings,36,36 records with negative kWh (-0.68 to -0.02 kWh),Clipped to 0.0 kWh; student flats have no generation/export; surrounding intervals confirm appliances were idle with zero-drift noise.
+Missing Energy Value Imputation,490,490 records with missing energy_value,Imputed via appliance-specific median by hour of day (preserving baseloads for A01/A05/A06 and idle 0.0 for cyclical A02/A03/A04).
+Duplicate Deduplication,125,"125 duplicate reading pairs (250 rows), including 25 pairs with +0.13 kWh corrupted offset","Deduplicated keeping the true baseline measurement (min value), removing 125 redundant rows."
+Flat F006 Outage Imputation,42,42 missing records for Flat F006 on 2026-10-12 (08:00 - 13:00 UTC),Synthesized complete regular time-series grid and imputed 42 outage records using F006 appliance-specific hourly medians.

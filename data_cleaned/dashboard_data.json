@@ -1,0 +1,452 @@
+{
+  "flats": [
+    {
+      "flat_id": "F001",
+      "residents": 2,
+      "floor_area_m2": 56,
+      "total_kwh": 441.45,
+      "spot_cost_sek": 214.54,
+      "full_cost_sek": 697.49,
+      "carbon_kg": 16.04,
+      "kwh_per_res": 220.72,
+      "daily_kwh_per_res": 7.88
+    },
+    {
+      "flat_id": "F002",
+      "residents": 3,
+      "floor_area_m2": 69,
+      "total_kwh": 174.95,
+      "spot_cost_sek": 100.86,
+      "full_cost_sek": 296.21,
+      "carbon_kg": 6.97,
+      "kwh_per_res": 58.32,
+      "daily_kwh_per_res": 2.08
+    },
+    {
+      "flat_id": "F003",
+      "residents": 4,
+      "floor_area_m2": 82,
+      "total_kwh": 144.63,
+      "spot_cost_sek": 83.78,
+      "full_cost_sek": 245.38,
+      "carbon_kg": 5.85,
+      "kwh_per_res": 36.16,
+      "daily_kwh_per_res": 1.29
+    },
+    {
+      "flat_id": "F004",
+      "residents": 2,
+      "floor_area_m2": 56,
+      "total_kwh": 149.9,
+      "spot_cost_sek": 81.49,
+      "full_cost_sek": 247.64,
+      "carbon_kg": 5.94,
+      "kwh_per_res": 74.95,
+      "daily_kwh_per_res": 2.68
+    },
+    {
+      "flat_id": "F005",
+      "residents": 5,
+      "floor_area_m2": 95,
+      "total_kwh": 236.39,
+      "spot_cost_sek": 138.12,
+      "full_cost_sek": 402.55,
+      "carbon_kg": 9.46,
+      "kwh_per_res": 47.28,
+      "daily_kwh_per_res": 1.69
+    },
+    {
+      "flat_id": "F006",
+      "residents": 3,
+      "floor_area_m2": 69,
+      "total_kwh": 149.29,
+      "spot_cost_sek": 83.43,
+      "full_cost_sek": 249.47,
+      "carbon_kg": 5.96,
+      "kwh_per_res": 49.76,
+      "daily_kwh_per_res": 1.78
+    },
+    {
+      "flat_id": "F007",
+      "residents": 4,
+      "floor_area_m2": 82,
+      "total_kwh": 499.84,
+      "spot_cost_sek": 248.53,
+      "full_cost_sek": 796.77,
+      "carbon_kg": 18.25,
+      "kwh_per_res": 124.96,
+      "daily_kwh_per_res": 4.46
+    },
+    {
+      "flat_id": "F008",
+      "residents": 2,
+      "floor_area_m2": 56,
+      "total_kwh": 134.22,
+      "spot_cost_sek": 77.11,
+      "full_cost_sek": 226.91,
+      "carbon_kg": 5.51,
+      "kwh_per_res": 67.11,
+      "daily_kwh_per_res": 2.4
+    }
+  ],
+  "channels": {
+    "F001": {
+      "A01": 35.42,
+      "A02": 40.09,
+      "A03": 6.11,
+      "A04": 13.6,
+      "A05": 20.52,
+      "A06": 28.09,
+      "A07": 297.62
+    },
+    "F002": {
+      "A01": 58.32,
+      "A02": 41.06,
+      "A03": 6.33,
+      "A04": 12.98,
+      "A05": 24.94,
+      "A06": 31.32,
+      "A07": 0.0
+    },
+    "F003": {
+      "A01": 35.29,
+      "A02": 31.65,
+      "A03": 7.8,
+      "A04": 11.15,
+      "A05": 25.67,
+      "A06": 33.07,
+      "A07": 0.0
+    },
+    "F004": {
+      "A01": 35.33,
+      "A02": 32.93,
+      "A03": 6.75,
+      "A04": 12.09,
+      "A05": 34.91,
+      "A06": 27.84,
+      "A07": 0.05
+    },
+    "F005": {
+      "A01": 35.55,
+      "A02": 44.56,
+      "A03": 9.46,
+      "A04": 12.0,
+      "A05": 33.93,
+      "A06": 100.84,
+      "A07": 0.04
+    },
+    "F006": {
+      "A01": 35.25,
+      "A02": 38.51,
+      "A03": 7.61,
+      "A04": 11.39,
+      "A05": 25.17,
+      "A06": 31.37,
+      "A07": 0.0
+    },
+    "F007": {
+      "A01": 35.06,
+      "A02": 35.92,
+      "A03": 9.81,
+      "A04": 12.21,
+      "A05": 29.64,
+      "A06": 34.27,
+      "A07": 342.93
+    },
+    "F008": {
+      "A01": 35.18,
+      "A02": 30.41,
+      "A03": 6.62,
+      "A04": 12.28,
+      "A05": 21.02,
+      "A06": 28.68,
+      "A07": 0.03
+    }
+  },
+  "hourly": [
+    {
+      "dt_utc": 0,
+      "mean_kwh": 0.054,
+      "spot_price": 0.294,
+      "carbon_factor": 30.988
+    },
+    {
+      "dt_utc": 1,
+      "mean_kwh": 0.054,
+      "spot_price": 0.289,
+      "carbon_factor": 30.795
+    },
+    {
+      "dt_utc": 2,
+      "mean_kwh": 0.053,
+      "spot_price": 0.308,
+      "carbon_factor": 30.723
+    },
+    {
+      "dt_utc": 3,
+      "mean_kwh": 0.051,
+      "spot_price": 0.292,
+      "carbon_factor": 32.29
+    },
+    {
+      "dt_utc": 4,
+      "mean_kwh": 0.049,
+      "spot_price": 0.315,
+      "carbon_factor": 30.681
+    },
+    {
+      "dt_utc": 5,
+      "mean_kwh": 0.097,
+      "spot_price": 0.766,
+      "carbon_factor": 46.969
+    },
+    {
+      "dt_utc": 6,
+      "mean_kwh": 0.039,
+      "spot_price": 0.852,
+      "carbon_factor": 50.392
+    },
+    {
+      "dt_utc": 7,
+      "mean_kwh": 0.028,
+      "spot_price": 0.859,
+      "carbon_factor": 50.596
+    },
+    {
+      "dt_utc": 8,
+      "mean_kwh": 0.028,
+      "spot_price": 0.41,
+      "carbon_factor": 34.852
+    },
+    {
+      "dt_utc": 9,
+      "mean_kwh": 0.026,
+      "spot_price": 0.318,
+      "carbon_factor": 32.639
+    },
+    {
+      "dt_utc": 10,
+      "mean_kwh": 0.065,
+      "spot_price": 0.319,
+      "carbon_factor": 31.706
+    },
+    {
+      "dt_utc": 11,
+      "mean_kwh": 0.028,
+      "spot_price": 0.289,
+      "carbon_factor": 33.157
+    },
+    {
+      "dt_utc": 12,
+      "mean_kwh": 0.021,
+      "spot_price": 0.29,
+      "carbon_factor": 32.416
+    },
+    {
+      "dt_utc": 13,
+      "mean_kwh": 0.022,
+      "spot_price": 0.307,
+      "carbon_factor": 32.632
+    },
+    {
+      "dt_utc": 14,
+      "mean_kwh": 0.022,
+      "spot_price": 0.336,
+      "carbon_factor": 31.645
+    },
+    {
+      "dt_utc": 15,
+      "mean_kwh": 0.035,
+      "spot_price": 0.849,
+      "carbon_factor": 47.725
+    },
+    {
+      "dt_utc": 16,
+      "mean_kwh": 0.08,
+      "spot_price": 0.944,
+      "carbon_factor": 51.72
+    },
+    {
+      "dt_utc": 17,
+      "mean_kwh": 0.082,
+      "spot_price": 0.91,
+      "carbon_factor": 49.823
+    },
+    {
+      "dt_utc": 18,
+      "mean_kwh": 0.102,
+      "spot_price": 0.925,
+      "carbon_factor": 49.344
+    },
+    {
+      "dt_utc": 19,
+      "mean_kwh": 0.066,
+      "spot_price": 0.382,
+      "carbon_factor": 33.434
+    },
+    {
+      "dt_utc": 20,
+      "mean_kwh": 0.059,
+      "spot_price": 0.307,
+      "carbon_factor": 32.293
+    },
+    {
+      "dt_utc": 21,
+      "mean_kwh": 0.062,
+      "spot_price": 0.321,
+      "carbon_factor": 32.564
+    },
+    {
+      "dt_utc": 22,
+      "mean_kwh": 0.054,
+      "spot_price": 0.262,
+      "carbon_factor": 33.648
+    },
+    {
+      "dt_utc": 23,
+      "mean_kwh": 0.055,
+      "spot_price": 0.3,
+      "carbon_factor": 32.2
+    }
+  ],
+  "top10": [
+    {
+      "Rank": 1,
+      "Flat_ID": "F007",
+      "Appliance": "A07: Portable Electric Heater",
+      "Issue_Type": "Overheating & Fuel Switching (District Heat)",
+      "Scope": "Flat F007 (4 residents)",
+      "4W_Avoided_kWh": 342.9,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 155.4,
+      "4W_Full_SEK": 527.8,
+      "4W_Carbon_kg": 12.06,
+      "Confidence": "High (r = -0.98 outdoor temp; indoor 22.5\u00b0C avg)"
+    },
+    {
+      "Rank": 2,
+      "Flat_ID": "F001",
+      "Appliance": "A07: Portable Electric Heater",
+      "Issue_Type": "Avoidable Electric Heating (District Heat)",
+      "Scope": "Flat F001 (2 residents)",
+      "4W_Avoided_kWh": 297.6,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 124.9,
+      "4W_Full_SEK": 445.6,
+      "4W_Carbon_kg": 10.14,
+      "Confidence": "High (67.4% of flat load; r = -0.88 outdoor)"
+    },
+    {
+      "Rank": 3,
+      "Flat_ID": "All Flats",
+      "Appliance": "A02: Dishwasher / Washing Machine",
+      "Issue_Type": "Peak Load Shifting to Night (01-05 UTC)",
+      "Scope": "All 8 Flats (25 residents)",
+      "4W_Avoided_kWh": 0.0,
+      "4W_Shifted_kWh": 295.0,
+      "4W_Spot_SEK": 162.5,
+      "4W_Full_SEK": 203.1,
+      "4W_Carbon_kg": 5.44,
+      "Confidence": "High (384 cycles run at peak hours; 73% spot savings)"
+    },
+    {
+      "Rank": 4,
+      "Flat_ID": "F005",
+      "Appliance": "A06: Workstation / Desktop / Server",
+      "Issue_Type": "24/7 Idle Power / Standby (150W continuous)",
+      "Scope": "Flat F005 (5 residents)",
+      "4W_Avoided_kWh": 70.6,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 34.3,
+      "4W_Full_SEK": 111.5,
+      "4W_Carbon_kg": 2.65,
+      "Confidence": "High (3.3x higher baseload than cohort)"
+    },
+    {
+      "Rank": 5,
+      "Flat_ID": "F007",
+      "Appliance": "A07: Portable Electric Heater",
+      "Issue_Type": "Heating Empty Apartment (56 unocc hrs)",
+      "Scope": "Flat F007 (4 residents)",
+      "4W_Avoided_kWh": 23.9,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 15.9,
+      "4W_Full_SEK": 43.2,
+      "4W_Carbon_kg": 1.01,
+      "Confidence": "High (direct correlation with sensor-verified absence)"
+    },
+    {
+      "Rank": 6,
+      "Flat_ID": "F002",
+      "Appliance": "A01: Refrigerator / Freezer",
+      "Issue_Type": "Degraded Appliance / Seal Failure / Overcooling",
+      "Scope": "Flat F002 (3 residents)",
+      "4W_Avoided_kWh": 24.9,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 12.2,
+      "4W_Full_SEK": 39.5,
+      "4W_Carbon_kg": 0.84,
+      "Confidence": "Medium-High (86.8W continuous vs 52.5W cohort)"
+    },
+    {
+      "Rank": 7,
+      "Flat_ID": "All Flats",
+      "Appliance": "A05: Lighting & Media Standby",
+      "Issue_Type": "Nighttime Vampire Standby (01-05 UTC)",
+      "Scope": "All 8 Flats (25 residents)",
+      "4W_Avoided_kWh": 56.4,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 22.2,
+      "4W_Full_SEK": 82.6,
+      "4W_Carbon_kg": 1.93,
+      "Confidence": "Medium (requires smart plug or habit intervention)"
+    },
+    {
+      "Rank": 8,
+      "Flat_ID": "F001",
+      "Appliance": "A07: Portable Electric Heater",
+      "Issue_Type": "Overnight Heating (744W all night)",
+      "Scope": "Flat F001 (2 residents)",
+      "4W_Avoided_kWh": 52.1,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 19.6,
+      "4W_Full_SEK": 75.1,
+      "4W_Carbon_kg": 1.71,
+      "Confidence": "High (sleep hygiene setback to 18\u00b0C)"
+    },
+    {
+      "Rank": 9,
+      "Flat_ID": "Cohort",
+      "Appliance": "A03/A04: Oven / Hob / Kitchen",
+      "Issue_Type": "Unattended High-Power Cooking / Fire Risk",
+      "Scope": "Flats F001, F007, F008",
+      "4W_Avoided_kWh": 37.0,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 33.0,
+      "4W_Full_SEK": 77.2,
+      "4W_Carbon_kg": 1.68,
+      "Confidence": "Medium (safety hazard vs slow cooker ambiguity)"
+    },
+    {
+      "Rank": 10,
+      "Flat_ID": "F004",
+      "Appliance": "A05: Lighting & Entertainment",
+      "Issue_Type": "Lights Left ON in Empty Apartment (152 hrs)",
+      "Scope": "Flat F004 (2 residents)",
+      "4W_Avoided_kWh": 5.9,
+      "4W_Shifted_kWh": 0.0,
+      "4W_Spot_SEK": 2.3,
+      "4W_Full_SEK": 8.6,
+      "4W_Carbon_kg": 0.2,
+      "Confidence": "High (41.6W vs 4.0W cohort unoccupied baseline)"
+    }
+  ],
+  "annual_pitch": {
+    "avg_kwh_student": 216.8,
+    "avg_sek_spot_student": 160.7,
+    "avg_sek_full_student": 411.7,
+    "avg_co2_student": 9.8,
+    "high_kwh_student": 955.9,
+    "high_sek_full_student": 1514.9
+  }
+}
