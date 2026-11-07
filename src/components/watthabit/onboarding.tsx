@@ -70,7 +70,7 @@ export function Onboarding({ initial, editing, onFinish, onSkip }: { initial: Pr
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-heading"
-      className="fixed inset-0 z-50 overflow-y-auto bg-background"
+      className="fixed inset-0 z-50 h-dvh w-screen overflow-y-auto bg-background"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

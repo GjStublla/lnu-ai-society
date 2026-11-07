@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { ChevronRight, Gift, Radar as RadarIcon, SlidersHorizontal, Sparkles, Sun, Target, Zap } from "lucide-react";
+import { Gift, MessageCircle, Radar as RadarIcon, SlidersHorizontal, Sun, Target, Zap } from "lucide-react";
 import type { CoachRequest, Housing, RewardsResponse } from "@/types/contracts";
 import { Button } from "@/components/ui/button";
 import { buildFallbackCoach, type LocalPriceContext } from "@/lib/mock/coach";
@@ -33,7 +33,7 @@ import { InboxButton, InboxSheet, ReminderBanner, type BannerNotice } from "./no
 import { Onboarding } from "./onboarding";
 import { ASSUMED_KWH } from "./price-window";
 import { Radar, type RadarState } from "./radar";
-import { RewardHero, RewardWidget } from "./reward-progress";
+import { RewardFocus, RewardHero } from "./reward-progress";
 import { BadgesRow, DemoResetRow, PlusCard, VoucherCard } from "./rewards";
 import { AdviceCard, PriceStripCard, TodayHeader, UpcomingReminders } from "./today";
 import { useNowMinute } from "./use-now";
@@ -41,6 +41,7 @@ import { useNowMinute } from "./use-now";
 const NAV = [
   { id: "home", label: "Today", icon: Sun },
   { id: "challenges", label: "Challenges", icon: Target },
+  { id: "coach", label: "Chat", icon: MessageCircle },
   { id: "rewards", label: "Rewards", icon: Gift },
   { id: "radar", label: "Radar", icon: RadarIcon },
 ] as const;
@@ -416,25 +417,29 @@ export function WattHabitApp() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-30 border-b border-border/80 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-[440px] items-center justify-between gap-2 px-4">
-          <a href="#home" className="inline-flex min-h-11 items-center gap-2 text-[17px] font-bold tracking-tight" aria-label="WattHabit — go to Today">
-            <span className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground" aria-hidden="true">
+      <header className="sticky top-0 z-30 border-b border-border bg-background">
+        <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between gap-2 px-5 sm:px-8">
+          <a href="#home" className="inline-flex min-h-11 items-center gap-2.5 text-[21px] font-bold tracking-[-0.04em]" aria-label="WattHabit — go to Today">
+            <span className="grid size-8 place-items-center rounded-[10px] bg-primary text-primary-foreground" aria-hidden="true">
               <Zap className="size-4" />
             </span>
             WattHabit
           </a>
-          <div className="flex items-center gap-1">
-            <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">Demo · {region}</span>
+          <p className="hidden text-sm text-muted-foreground sm:block">Small habits. Real rewards.</p>
+          <div className="flex items-center gap-2">
+            <span className="rounded-md bg-secondary px-2.5 py-1 text-[11px] font-medium text-muted-foreground">Demo · {region}</span>
             <InboxButton unread={unread} onOpen={openInbox} />
           </div>
         </div>
       </header>
 
-      <main id="main" tabIndex={-1} className="mx-auto max-w-[440px] px-4 pb-32 outline-none">
+      <main id="main" tabIndex={-1} className="mx-auto max-w-[1120px] px-5 pb-32 outline-none sm:px-8">
         {/* TODAY */}
-        <section id="home" aria-labelledby="home-title" className="scroll-mt-16 space-y-4 pt-5">
+        <section id="home" aria-labelledby="home-title" className="scroll-mt-20 pt-7 sm:pt-10">
           <TodayHeader nowMs={nowMs} today={todayDay} now={nowLevel} />
+          <div className="today-layout">
+          <RewardFocus progress={demo.progress} goal={demo.goal} exampleStamps={Math.min(DEMO_EXAMPLE_STAMPS, demo.progress)} dropKey={dropKey} celebrateKey={celebrateKey} onOpenCoach={() => openCoach()} coachOpen={coachOpen} />
+          <div className="today-workspace">
           <AdviceCard
             suggestion={hero}
             loading={heroLoading}
@@ -447,10 +452,11 @@ export function WattHabitApp() {
             onShowSkipped={() => setSkipped([])}
             hasSkipped={skipped.length > 0 && suggestions.length > 0}
           />
-          <RewardWidget progress={demo.progress} goal={demo.goal} exampleStamps={Math.min(DEMO_EXAMPLE_STAMPS, demo.progress)} dropKey={dropKey} celebrateKey={celebrateKey} />
           <PriceStripCard plan={plan} today={todayDay} nowMs={nowMs} onRetry={() => setReloadKey((k) => k + 1)} onUseDemo={loadDemoPrices} />
           <UpcomingReminders rows={reminders} onPreview={previewReminder} />
-          <div className="flex items-center justify-between gap-2 px-1">
+          </div>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 px-1">
             <p className="min-w-0 truncate text-xs text-muted-foreground">
               {region} · {HOUSING_SHORT[prefs.housing]} · {prefs.activities.join(", ")} after {prefs.availableAfter}
             </p>
@@ -461,7 +467,7 @@ export function WattHabitApp() {
         </section>
 
         {/* CHALLENGES */}
-        <section id="challenges" aria-labelledby="challenges-title" className="scroll-mt-16 pt-10">
+        <section id="challenges" aria-labelledby="challenges-title" className="app-section scroll-mt-20 pt-10 sm:pt-14">
           <SectionHeading id="challenges-title" title="Challenges" />
           <ChallengesSection
             cards={cards}
@@ -471,27 +477,12 @@ export function WattHabitApp() {
             onDone={complete}
             onWhy={(id) => openCoach(whyQuestion(id))}
           />
-          <button
-            type="button"
-            onClick={() => openCoach()}
-            aria-haspopup="dialog"
-            className="mt-4 flex w-full items-center gap-3 rounded-[22px] border border-border bg-card p-4 text-left transition-colors hover:border-primary/30"
-          >
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground" aria-hidden="true">
-              <Sparkles className="size-5" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-semibold">Ask WattHabit</span>
-              <span className="block text-xs text-muted-foreground">Why this time? Will it lower my bill?</span>
-            </span>
-            <ChevronRight className="size-5 text-muted-foreground" aria-hidden="true" />
-          </button>
         </section>
 
         {/* REWARDS */}
-        <section id="rewards" aria-labelledby="rewards-title" className="scroll-mt-16 pt-10">
+        <section id="rewards" aria-labelledby="rewards-title" className="app-section scroll-mt-20 pt-10 sm:pt-14">
           <SectionHeading id="rewards-title" title="Rewards" />
-          <div className="space-y-3">
+          <div className="wallet-layout">
             <RewardHero progress={demo.progress} goal={demo.goal} exampleStamps={Math.min(DEMO_EXAMPLE_STAMPS, demo.progress)} dropKey={dropKey} celebrateKey={celebrateKey} />
             <BadgesRow earned={earnedBadges} />
             <VoucherCard
@@ -509,7 +500,7 @@ export function WattHabitApp() {
         </section>
 
         {/* RADAR */}
-        <section id="radar" aria-labelledby="radar-title" className="scroll-mt-16 pt-10">
+        <section id="radar" aria-labelledby="radar-title" className="app-section scroll-mt-20 pt-10 sm:pt-14">
           <SectionHeading id="radar-title" title="Savings Radar" sub="Public sources and dated opportunities when available." />
           <Radar state={radarState} />
         </section>
@@ -545,17 +536,26 @@ export function WattHabitApp() {
         {announcement}
       </p>
 
-      <nav aria-label="Main navigation" className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
-        <ul className="mx-auto grid max-w-[440px] grid-cols-4">
+      <nav aria-label="Main navigation" className="app-navigation">
+        <ul className="grid grid-cols-5">
           {NAV.map(({ id, label: navLabel, icon: Icon }) => {
-            const isActive = active === id;
+            const isActive = id === "coach" ? coachOpen : !coachOpen && active === id;
+            const navClass = cn("relative flex w-full min-h-16 flex-col items-center justify-center gap-1 text-[11px] transition-colors", isActive ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground");
+            if (id === "coach") return (
+              <li key={id}>
+                <button type="button" onClick={() => openCoach()} aria-haspopup="dialog" aria-expanded={coachOpen} aria-label="Chat with WattHabit" className={navClass}>
+                  <span className={cn("grid h-8 w-12 place-items-center rounded-xl transition-colors", coachOpen ? "bg-primary text-primary-foreground" : "bg-accent text-primary")}><Icon className="size-5" aria-hidden="true" /></span>
+                  {navLabel}
+                </button>
+              </li>
+            );
             return (
               <li key={id}>
                 <a
                   href={`#${id}`}
                   aria-current={isActive ? "location" : undefined}
                   onClick={() => setActive(id)}
-                  className={cn("relative flex min-h-16 flex-col items-center justify-center gap-1 text-[11px] transition-colors", isActive ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground")}
+                  className={navClass}
                 >
                   {isActive && <motion.span layoutId="nav-indicator" className="absolute top-1.5 h-1 w-6 rounded-full bg-primary" aria-hidden="true" />}
                   <Icon className="size-5" aria-hidden="true" />
