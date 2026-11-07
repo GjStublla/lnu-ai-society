@@ -34,7 +34,7 @@ function browser() {
 const home = await get("/");
 assert.equal(home.status, 200, "home SSR shell");
 const html = (await home.text()).replace(/<!--.*?-->/gs, "");
-for (const text of ["WattHabit", "Demo · SE4", "Shifting changes when you use energy, not how much", "rewards", "radar"]) {
+for (const text of ["WattHabit", "Demo · SE4", "Shifting changes when you use energy, not how many kWh", "3 example stamps · demo progress", "rewards", "radar"]) {
   assert.ok(html.toLowerCase().includes(text.toLowerCase()), `home missing ${text}`);
 }
 

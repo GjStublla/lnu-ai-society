@@ -27,7 +27,7 @@ npm run lint
 npm run build
 npm test
 ```
-`npm test` runs 25 coach tests, 33 energy tests, an offline production smoke check and the cookie-based reward flow (validation, repeat completion, unlock, repeat redemption and browser isolation). Build first. CI runs the same checks on main and PRs. Tests use no paid model calls. `npm start` serves a built app. Recommended Node 24; native feature tests require Node >=22.18.
+`npm test` runs 26 coach tests, 33 energy tests, an offline production smoke check and the cookie-based reward flow (validation, repeat completion, unlock, repeat redemption and browser isolation). Build first. CI runs the same checks on main and PRs. Tests use no paid model calls. `npm start` serves a built app. Recommended Node 24; native feature tests require Node >=22.18.
 
 Deployment acceptance: `node scripts/demo-workflows.mjs --url https://lnu-ai-society.vercel.app`. Add `--live-coach` for one real coach request, which may use Groq quota; missing quota/key still yields labeled fallback. This script verifies HTTP workflows, not visual interactions.
 

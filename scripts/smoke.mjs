@@ -37,8 +37,9 @@ try {
   const html = (await response.text()).replace(/<!--.*?-->/gs, "");
   assert.match(html, /WattHabit/);
   assert.match(html, /Demo · SE4/);
-  assert.match(html, /Shifting changes when you use energy, not how much/);
-  assert.match(html, /Modeled estimate/);
+  assert.match(html, /Shifting changes when you use energy, not how many kWh/);
+  assert.match(html, /Estimates \(est\.\) are modeled with stated assumptions/);
+  assert.match(html, /3 example stamps · demo progress/);
   assert.match(html, /No verified offers right now|Savings Radar/);
   for (const target of ["home", "challenges", "rewards", "radar"]) {
     assert.ok(html.includes(`id="${target}"`), `Missing navigation destination: ${target}`);

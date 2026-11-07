@@ -2,7 +2,7 @@
 
 ## Recorded checks — 2026-11-07
 - [x] Integrated frontend/energy/backend/coach passes typecheck, zero-warning lint and production build without live keys.
-- [x] 25 coach tests: validation, grounding, trusted server windows, provider failure/429, byte limits, deadlines and cancellation.
+- [x] 26 coach tests: validation, grounding, trusted server windows, tariff/efficiency explanations, provider failure/429, byte limits, deadlines and cancellation.
 - [x] 33 energy tests: negative prices, continuity, modeled costs, 92/100-slot DST days, availability, impossible dates, actual streamed byte cap and sourced catalog.
 - [x] Offline production smoke: page/navigation/assets, key-free coach fallback, invalid requests, unavailable prices, explicit demo prices and sourced Radar.
 - [x] Cookie reward API: 3→4→5, repeated completion unchanged, locked/invalid redemption rejected, repeat redemption idempotent, browser isolation.
@@ -13,11 +13,11 @@
 ## Repeatable three-minute presentation
 1. Open the public URL in a fresh browser profile, or use **Rewards → Reset browser demo**. Reset restarts local preferences/stamps; the separate HttpOnly reward history remains. Start at 3/5 example stamps.
 2. Onboard with SE4, **electricity included in rent** or your actual billing choice, laundry, and a realistic free-from time. Reminders are in-app only.
-3. Show Today: price source/status, Europe/Stockholm, the complete eligible window and modeled spot-cost comparison. Actual prices change: if no useful window exists, show the honest message and habit suggestion. If the feed fails, use **Try demo prices** and say they are an example.
+3. Show Today: price source/status, Europe/Stockholm, the complete eligible window and modeled spot-cost comparison (tap the information button for assumptions). Actual prices change: if no useful window exists, show the honest message and habit suggestion. If the feed fails, use **Use demo prices** and say they are an example.
 4. Open **Why?** / the coach. Ask “Why should I move laundry?” Show its source, billing caveat and Groq-or-written-fallback label. The server verifies numerical price facts independently; the model selects reviewed guidance. Shifting the same task does not reduce kWh.
 5. Open Challenges. For a predictable cup-fill demo, accept and complete **two different habit challenges**. Each adds one self-reported participation stamp, taking 3/5 to 5/5. A tomorrow price quest cannot be completed today; do not depend on tomorrow's window for the live unlock.
 6. Open Rewards: show **DEMO — NOT REDEEMABLE**, the illustrative code/QR and **Redeem (demo)**. Explain that this records demo state and issues nothing of value. Plus is a proposed ~$5/month plan; no payments or secured partners.
-7. Open Radar: show one of the two dated Elpriskollen public guidance cards and its official source. These are public energy guidance, not exclusive offers or subsidies.
+7. Open Radar: show one of the two dated Elpriskollen public guidance cards, tap its information button for details/eligibility, then open its official source. These are public energy guidance, not exclusive offers or subsidies.
 
 ## Production API acceptance
 After Vercel reports the integrated commit ready:

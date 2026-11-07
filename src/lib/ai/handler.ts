@@ -1,5 +1,6 @@
 import "server-only";
-import type { ApiErrorResponse, CoachResponse } from "../../types/contracts.ts";
+import type { ApiErrorResponse, CoachRequest, CoachResponse } from "../../types/contracts.ts";
+import type { VerifiedPriceContext } from "./context.ts";
 import { buildCoachResponse, chooseFallbackTopic } from "./catalog.ts";
 import { getCoachResponse, type CoachDependencies } from "./coach.ts";
 import { coachRequestSchema } from "./schema.ts";
@@ -11,7 +12,7 @@ const invalidBody = () => Response.json({
   error: "Send a valid JSON coach request no larger than 8 KB.",
 } satisfies ApiErrorResponse, { status: 400, headers });
 
-export async function handleCoachRequest(request: Request, dependencies: CoachDependencies = {}): Promise<Response> {
+export async function handleCoachRequest(request: Request, dependencies: CoachDependencies & { loadPriceContext?: (input: CoachRequest) => Promise<VerifiedPriceContext | null> } = {}): Promise<Response> {
   if (request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== "application/json") return invalidBody();
   let body: unknown;
   try {
@@ -25,8 +26,12 @@ export async function handleCoachRequest(request: Request, dependencies: CoachDe
   } satisfies ApiErrorResponse, { status: 400, headers });
 
   let result: CoachResponse;
+  let priceContext = dependencies.priceContext ?? null;
+  if (dependencies.loadPriceContext && !request.signal.aborted) {
+    try { priceContext = await withDeadline(1500, () => dependencies.loadPriceContext!(parsed.data), request.signal); } catch { /* Missing prices keep written guidance usable. */ }
+  }
   try {
-    result = await getCoachResponse(parsed.data, { ...dependencies, signal: request.signal });
+    result = await getCoachResponse(parsed.data, { ...dependencies, priceContext, signal: request.signal });
   } catch {
     result = buildCoachResponse(parsed.data, chooseFallbackTopic(parsed.data));
   }
