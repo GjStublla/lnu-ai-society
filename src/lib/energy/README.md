@@ -31,7 +31,7 @@ not modified.
 - `sourceUrl` is the exact upstream JSON URL, e.g.
   `https://www.elprisetjustnu.se/api/v1/prices/2026/11-07_SE4.json`.
 - Upstream requests have a 6-second deadline (`AbortSignal.timeout`), a 512 KB
-  declared-body cap and a 200-record cap, and are never made at build time
+  streamed-body cap (declared length is an early check only) and a 200-record cap, and are never made at build time
   (`dynamic = "force-dynamic"`; both routes build as ƒ).
 
 `demo=1` is an additive, opt-in flag for offline demos. It is not part of
@@ -54,10 +54,6 @@ Current entries (checked 2026-11-07):
 | --- | --- |
 | 2025-09-16 | [Elpriskollen — quarter-hour contracts](https://elpriskollen.se/sidor/sank-dina-kostnader-med-kvartsprisavtal.html) |
 | 2026-03-23 | [Elpriskollen — steer your electricity use](https://elpriskollen.se/sidor/styr-din-elanvandning.html) |
-| 2026-03-23 | [Energimyndigheten — municipal energy advice](https://www.energimyndigheten.se/effektiv-energianvandning/hushall/energi--och-klimatradgivning/) |
-
-The Energimyndigheten page exposes only “Senast uppdaterad 2026-03-23”, so
-`publishedAt` carries that evidenced update date and the description says so.
 The Elpriskollen dates come from the pages' machine-readable `Skapad` timestamps.
 Where a source exposes only a date, midnight Stockholm is used as the instant.
 
@@ -87,8 +83,10 @@ const window = findCheapestWindow(prices.intervals, {
 time-weighted `averageSekPerKwh`, the interval count and an optional
 `estimatedSek = averageSekPerKwh × assumedKwh`.
 
-`availableUntil: "00:00"` means the end of the day, so an evening window that
-finishes at midnight can still be selected. Availability is otherwise same-day:
+Availability boundaries are resolved to instants for each Stockholm date using
+the earlier occurrence during the autumn repeated hour. A nonexistent spring
+clock boundary makes that date unavailable. `availableUntil: "00:00"` means the
+end of the day, so an evening window that finishes at midnight can still be selected. Availability is otherwise same-day:
 overnight ranges such as 22:00–02:00 are not supported. Pass intervals for one
 Stockholm day — availability values are wall-clock minutes and are not
 date-scoped, so mixing days would compare times across dates.
@@ -111,23 +109,23 @@ local start and end (`02:45–02:45`); use the ISO instants to disambiguate.
 
 ## Tests
 
-Offline feature tests (29, no network, Node 24 built-in runner + type stripping):
+Offline feature tests (33, no provider network; loader tests replace `fetch`,
+Node built-in runner + type stripping):
 
 ```bash
 node --test "src/lib/energy/__tests__/*.test.mjs"
 ```
 
-Covered: impossible/leap dates, Stockholm day bounds, 23/25-hour days, DST gap
+Covered: impossible/leap dates (including malformed upstream timestamps), Stockholm day bounds, 23/25-hour days, DST gap
 and overlap conversion, parser sorting/validation/negative prices/gaps/overlaps/
-oversized payloads, declared-body limits, hourly history (whole-hour windows
+oversized payloads, actual streamed-body limits with missing/understated length, hourly history (whole-hour windows
 only), unpublished-vs-invalid payloads, URL building, 60/90/120-minute window
 math, availability windows including “until midnight”, empty/unusable interval
 lists, duplicate-slot deduplication, minimum notice, assumed-load estimates,
 failure copy, opportunity-feed freshness, and the verified-opportunity catalog.
 
-The offline suite covers the pure modules. The service/route layer performs
-network I/O and is covered by the production-server integration checks below,
-not by `node --test`.
+The suite also stubs `fetch` to exercise the live loader's actual streamed-body
+limit without contacting the price provider.
 
 Project checks:
 

@@ -53,8 +53,8 @@ export type UsefulPlan = DayPlan & { plan: QuestPlan; reminderAt: string };
 
 const MIN_USEFUL_DIFF_SEK = 0.05;
 
-function buildDayPlan(day: DayPlan["day"], source: PriceDay, startMin: number, durationMin: number): DayPlan {
-  const { list, plan } = planQuest(source.data.intervals, startMin, durationMin);
+function buildDayPlan(day: DayPlan["day"], source: PriceDay, startMin: number, durationMin: number, nowMs: number | null): DayPlan {
+  const { list, plan } = planQuest(source.data.intervals, startMin, durationMin, new Date(nowMs ?? Date.now()));
   const startMinutes = plan ? stockholmMinutesOfDay(plan.cheapest.startsAt) : 0;
   return {
     day,
@@ -77,12 +77,12 @@ export function choosePlan(today: PriceDay | null, tomorrow: PriceDay | null, ac
   let fallback: DayPlan | null = null;
   if (isUsable(today)) {
     const nowMin = nowMs === null ? 0 : stockholmMinutesOfDay(new Date(nowMs).toISOString());
-    const plan = buildDayPlan("today", today, Math.max(avail, nowMin), duration);
+    const plan = buildDayPlan("today", today, Math.max(avail, nowMin), duration, nowMs);
     if (plan.useful) return plan;
     fallback = plan;
   }
   if (isUsable(tomorrow)) {
-    const plan = buildDayPlan("tomorrow", tomorrow, avail, duration);
+    const plan = buildDayPlan("tomorrow", tomorrow, avail, duration, nowMs);
     if (plan.useful) return plan;
   }
   return fallback;

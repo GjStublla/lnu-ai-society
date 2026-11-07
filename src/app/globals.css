@@ -70,27 +70,26 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
 }
 
 :root {
-  /* Calm energy palette: off-white, deep teal primary.
-     --energy (lime) is ONLY for cheap-price / happy-hour moments; --peak (amber) ONLY for peak warnings. */
-  --background: #f4f6f5;
-  --foreground: #10201d;
-  --card: #ffffff;
-  --card-foreground: #10201d;
-  --popover: #ffffff;
-  --popover-foreground: #10201d;
-  --primary: #0b5d55;
+  /* Warm coffeehouse neutrals with a restrained green action color. */
+  --background: #f7f4ed;
+  --foreground: #29251f;
+  --card: #fffdf8;
+  --card-foreground: #29251f;
+  --popover: #fffdf8;
+  --popover-foreground: #29251f;
+  --primary: #356b50;
   --primary-foreground: #ffffff;
-  --secondary: #eaefed;
-  --secondary-foreground: #20322e;
-  --muted: #eef2f0;
-  --muted-foreground: #56665f;
-  --accent: #e1efeb;
-  --accent-foreground: #0a4943;
+  --secondary: #eee9de;
+  --secondary-foreground: #3c382f;
+  --muted: #f0ece3;
+  --muted-foreground: #69645a;
+  --accent: #e6eee5;
+  --accent-foreground: #2e5b43;
   --destructive: #c2362b;
-  --border: #e0e6e3;
-  --input: #ccd6d2;
-  --ring: #0b5d55;
-  --focus: #0b5d55;
+  --border: #e6dfd2;
+  --input: #d4ccbd;
+  --ring: #356b50;
+  --focus: #356b50;
   --energy: #c9f25a;
   --energy-strong: #8fd422;
   --energy-ink: #1d3a06;

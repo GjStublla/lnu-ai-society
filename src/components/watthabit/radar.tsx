@@ -18,7 +18,7 @@ export function Radar({ state }: { state: RadarState }) {
 
       {state.kind === "ready" && state.fallback && (
         <p className="text-xs text-muted-foreground" role="status">
-          Opportunity feed not connected — showing a labelled demo example. No verified offers are shown.
+          Opportunity feed unavailable. No offers are shown until a dated, sourced item is available.
         </p>
       )}
 

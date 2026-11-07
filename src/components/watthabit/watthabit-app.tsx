@@ -404,6 +404,7 @@ export function WattHabitApp() {
 
   function resetDemo() {
     resetDemoState();
+    setServerRewards(null);
     setSkipped([]);
     setRedeemMessage(null);
     setReadIds([]);
@@ -514,7 +515,7 @@ export function WattHabitApp() {
 
         {/* RADAR */}
         <section id="radar" aria-labelledby="radar-title" className="scroll-mt-16 pt-10">
-          <SectionHeading id="radar-title" title="Savings Radar" sub="Verified energy news & incentives." />
+          <SectionHeading id="radar-title" title="Savings Radar" sub="Public sources and dated opportunities when available." />
           <Radar state={radarState} />
         </section>
 

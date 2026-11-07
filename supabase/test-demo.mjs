@@ -12,8 +12,7 @@ const { port } = listener.address();
 await new Promise((resolve) => listener.close(resolve));
 
 const env = { ...process.env, NODE_ENV: "production" };
-delete env.NEXT_PUBLIC_SUPABASE_URL;
-delete env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+for (const name of ["GROQ_API_KEY", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) env[name] = "";
 const server = spawn(process.execPath, [
   "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port),
 ], { env, stdio: ["ignore", "pipe", "pipe"] });

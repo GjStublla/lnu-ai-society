@@ -1,4 +1,5 @@
 import type { DataStatus, PriceInterval } from "@/types/contracts";
+import { addCalendarDays, zonedTimeToInstant } from "./time.ts";
 
 /**
  * Cheapest contiguous price windows for a user's availability.
@@ -201,12 +202,18 @@ export function findCheapestWindows(
       if (first.startMs < earliestStartMs) continue;
 
       const startLocal = localFields(first.startMs);
-      const endLocal = localFields(endMs);
-
-      if (afterMinutes !== null && startLocal.minutes < afterMinutes) continue;
+      if (afterMinutes !== null) {
+        const boundary = zonedTimeToInstant(startLocal.dateKey, options.availableAfter!);
+        // A requested spring-forward wall time does not exist. Treat that
+        // date as unavailable instead of silently shifting the user's limit.
+        if (!boundary || first.startMs < boundary.getTime()) continue;
+      }
       if (untilMinutes !== null) {
-        const endMinutes = endLocal.dateKey === startLocal.dateKey ? endLocal.minutes : 24 * 60;
-        if (endMinutes > untilMinutes) continue;
+        const untilDate = rawUntilMinutes === 0
+          ? addCalendarDays(startLocal.dateKey, 1)
+          : startLocal.dateKey;
+        const boundary = untilDate ? zonedTimeToInstant(untilDate, options.availableUntil!) : null;
+        if (!boundary || endMs > boundary.getTime()) continue;
       }
 
       candidates.push({

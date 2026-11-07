@@ -19,6 +19,7 @@ import {
   priceSourceUrl,
 } from "../prices.ts";
 import { findCheapestWindow, findCheapestWindows } from "../windows.ts";
+import { loadPrices } from "../service.ts";
 import {
   OPPORTUNITIES_UPDATED_AT,
   VERIFIED_OPPORTUNITIES,
@@ -220,6 +221,44 @@ test("source URL always keeps year, month and day", () => {
     "https://www.elprisetjustnu.se/api/v1/prices/2026/03-29_SE1.json",
   );
   assert.throws(() => priceSourceUrl("SE4", "2026-11"), RangeError);
+  assert.throws(() => priceSourceUrl("SE4", "2026-02-30"), RangeError);
+});
+
+test("upstream impossible dates and clock components are dropped", () => {
+  const records = [
+    { time_start: "2026-02-30T00:00:00Z", time_end: "2026-02-30T00:15:00Z", SEK_per_kWh: 1 },
+    { time_start: "2026-03-01T24:00:00Z", time_end: "2026-03-02T00:15:00Z", SEK_per_kWh: 1 },
+    { time_start: "2026-03-01T00:00:00Z", time_end: "2026-03-01T00:15:00Z", SEK_per_kWh: 1 },
+  ];
+  const parsed = parseUpstreamPrices(records);
+  assert.equal(parsed.intervals.length, 1);
+  assert.equal(parsed.droppedRecords, 2);
+});
+
+test("live loader enforces actual streamed bytes without trusting Content-Length", async () => {
+  const previousFetch = globalThis.fetch;
+  const date = "2097-01-02";
+  const bounds = stockholmDayBounds(date);
+  const record = JSON.stringify({
+    time_start: bounds.start.toISOString(),
+    time_end: new Date(bounds.start.getTime() + SLOT_MS).toISOString(),
+    SEK_per_kWh: 0.5,
+  });
+  try {
+    const acceptedBody = `[${record}${" ".repeat(500_000)}]`;
+    globalThis.fetch = async () => new Response(acceptedBody, { headers: { "content-length": "1" } });
+    const accepted = await loadPrices("SE4", date, new Date("2097-01-01T00:00:00Z"));
+    assert.equal(accepted.status, "live");
+    assert.equal(accepted.intervals.length, 1);
+
+    const oversizedBody = `[${record}${" ".repeat(540_000)}]`;
+    globalThis.fetch = async () => new Response(oversizedBody);
+    const rejected = await loadPrices("SE3", date, new Date("2097-01-01T00:00:00Z"));
+    assert.equal(rejected.status, "unavailable");
+    assert.deepEqual(rejected.intervals, []);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
 });
 
 test("60/90/120-minute windows use contiguous quarter-hour slots", () => {
@@ -294,6 +333,34 @@ test("availability constrains the window to the user's free time", () => {
     durationMinutes: 120,
   });
   assert.equal(tooLate.length, 0);
+});
+
+test("availability uses Stockholm instants through the autumn repeated hour", () => {
+  const day = buildDay("2026-10-25", () => 1);
+  const until = findCheapestWindows(day, {
+    durationMinutes: 60,
+    availableUntil: "02:30",
+    maxResults: 100,
+    now: new Date("2026-10-01T00:00:00Z"),
+  });
+  assert.ok(until.some((window) => window.endsAt === "2026-10-25T00:30:00.000Z"));
+  assert.ok(until.every((window) => Date.parse(window.endsAt) <= Date.parse("2026-10-25T00:30:00.000Z")));
+
+  const after = findCheapestWindows(day, {
+    durationMinutes: 60,
+    availableAfter: "02:30",
+    maxResults: 100,
+    now: new Date("2026-10-01T00:00:00Z"),
+  });
+  assert.ok(after.some((window) => window.startsAt === "2026-10-25T01:00:00.000Z"));
+});
+
+test("a nonexistent spring-forward availability boundary rejects that date", () => {
+  const day = buildDay("2026-03-29", () => 1);
+  assert.deepEqual(findCheapestWindows(day, {
+    availableAfter: "02:30",
+    now: new Date("2026-03-01T00:00:00Z"),
+  }), []);
 });
 
 test("minimum notice excludes past and near-term windows", () => {
@@ -470,7 +537,11 @@ test("opportunity catalog contains only sourced, verified, dated notices", () =>
   }
 
   const list = getCurrentOpportunities(new Date("2026-11-07T12:00:00Z"));
-  assert.ok(list.length >= 1);
+  assert.equal(list.length, 2);
+  assert.deepEqual(new Set(list.map((item) => item.id)), new Set([
+    "elpriskollen-kvartsprisavtal",
+    "elpriskollen-styr-din-elanvandning",
+  ]));
   for (let index = 1; index < list.length; index += 1) {
     assert.ok(
       Date.parse(list[index - 1].publishedAt) >= Date.parse(list[index].publishedAt),

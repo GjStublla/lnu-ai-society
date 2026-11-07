@@ -28,7 +28,7 @@ Do not edit someone else's owned paths. If an integration adjustment requires it
 8. Run `npm run typecheck`, `npm run lint`, `npm run build` before PR; don't claim success without running them.
 9. Submit small, reviewable PRs targeting `main`. Never push directly to main except Gjin's initial bootstrap. Never force-push main.
 10. By the freeze point, prefer bug fixes and a complete deployed flow over new features.
-11. `npm test` currently smoke-tests the built shell; run it after build. Owners must add meaningful feature-specific verification and report it in their PR; do not claim the shell smoke test validates energy math, RLS or AI.
+11. Run `npm test` after build: coach and energy unit tests, key-free production smoke and cookie reward workflow checks. These do not validate a live Supabase project's RLS or substitute for a mobile browser click-through.
 
 ## Definition of done
 Working feature that follows `docs/CONTRACT.md`, UI states for loading/error/fallback where applicable, build and tests reported, branch pushed, PR opened, and clear handoff in PR body.

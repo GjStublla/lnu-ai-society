@@ -1,4 +1,5 @@
 import type { PriceInterval, PricesResponse, Region } from "@/types/contracts";
+import { isValidCalendarDate } from "./time.ts";
 
 /**
  * Validation and normalization of the Elprisetjustnu daily JSON feed.
@@ -21,7 +22,7 @@ export const PRICE_SOURCE_HOST = "www.elprisetjustnu.se";
  */
 export function priceSourceUrl(region: Region, date: string): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
-  if (!match) throw new RangeError(`Invalid price date: ${date}`);
+  if (!match || !isValidCalendarDate(date)) throw new RangeError(`Invalid price date: ${date}`);
   return `https://${PRICE_SOURCE_HOST}/api/v1/prices/${match[1]}/${match[2]}-${match[3]}_${region}.json`;
 }
 
@@ -73,6 +74,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function readInstant(value: unknown): number | null {
   if (typeof value !== "string" || !ISO_INSTANT_PATTERN.test(value)) return null;
+  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(Z|([+-])(\d{2}):(\d{2}))$/.exec(value);
+  if (!match || !isValidCalendarDate(match[1])) return null;
+  if (Number(match[2]) > 23 || Number(match[3]) > 59 || Number(match[4]) > 59) return null;
+  if (match[5] !== "Z" && (Number(match[7]) > 23 || Number(match[8]) > 59)) return null;
   const instant = Date.parse(value);
   return Number.isFinite(instant) ? instant : null;
 }

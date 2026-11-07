@@ -2,13 +2,14 @@ import type { PriceInterval, PricesResponse, Region } from "@/types/contracts";
 import {
   classifyEmptyPayload,
   isDeclaredPayloadTooLarge,
+  MAX_UPSTREAM_BYTES,
   parseUpstreamPrices,
   priceFailureMessage,
   priceSourceUrl,
   pricesResponse,
   type PriceFailureReason,
-} from "./prices";
-import { addCalendarDays, stockholmDateString, stockholmDateTimeLabel, stockholmDayBounds } from "./time";
+} from "./prices.ts";
+import { addCalendarDays, stockholmDateString, stockholmDateTimeLabel, stockholmDayBounds } from "./time.ts";
 
 /**
  * Server-side price loader: bounded upstream request, validation, a small
@@ -152,7 +153,27 @@ async function fetchPrices(input: {
 
   let payload: unknown;
   try {
-    payload = await response.json();
+    if (!response.body) return fail("invalid_payload");
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let totalBytes = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_UPSTREAM_BYTES) {
+        await reader.cancel();
+        return fail("invalid_payload");
+      }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(totalBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    payload = JSON.parse(new TextDecoder().decode(bytes));
   } catch (error) {
     // The deadline can fire after headers arrive but while the body is read.
     const timedOut =

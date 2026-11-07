@@ -126,9 +126,9 @@ export function VoucherCard({
 export function DemoResetRow({ onReset }: { onReset: () => void }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-[18px] border border-dashed border-input px-4 py-3">
-      <p className="text-[11px] leading-snug text-muted-foreground">Progress is browser-local demo — not a server-validated entitlement.</p>
+      <p className="text-[11px] leading-snug text-muted-foreground">Browser-local demo progress. Reset starts this browser again; server reward history stays unchanged.</p>
       <Button variant="outline" className="h-10 shrink-0 rounded-full px-3" onClick={onReset}>
-        <RotateCcw aria-hidden="true" /> Reset demo
+        <RotateCcw aria-hidden="true" /> Reset browser demo
       </Button>
     </div>
   );

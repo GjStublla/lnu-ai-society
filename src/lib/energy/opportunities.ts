@@ -16,8 +16,8 @@ export const OPPORTUNITIES_UPDATED_AT = "2026-11-07T00:00:00+01:00";
  * - Every entry needs a live public HTTPS URL that supports the title, date
  *   and eligibility. No cafe partnerships, vouchers or exclusive discounts are
  *   invented here.
- * - `publishedAt` is an evidenced date taken from the source page. Where a
- *   page exposes only a "last updated" date, the description says so.
+ * - `publishedAt` is an evidenced publication date taken from the source page.
+ *   Omit pages that expose only a "last updated" date.
  * - Empty verified feeds are allowed. Do not add a demo entry to fill space;
  *   the UI shows a demo card separately if it wants one.
  */
@@ -47,23 +47,6 @@ export const VERIFIED_OPPORTUNITIES: readonly Opportunity[] = [
     expiresAt: null,
     eligibility:
       "Open to all households. The largest potential is for homes with electric heating, a heat pump or home EV charging.",
-    category: "energy",
-    verified: true,
-    demo: false,
-  },
-  {
-    id: "energimyndigheten-energi-klimatradgivning",
-    title: "Free municipal energy and climate advice",
-    description:
-      "Energimyndigheten describes the municipal energy and climate advice service: free, impartial help with heating, energy efficiency, transport and energy costs. The source page states it was last updated on 2026-03-23.",
-    sourceUrl:
-      "https://www.energimyndigheten.se/effektiv-energianvandning/hushall/energi--och-klimatradgivning/",
-    // The page exposes only "Senast uppdaterad 2026-03-23"; no earlier
-    // publication date is shown, so the evidenced update date is used.
-    publishedAt: "2026-03-23T00:00:00+01:00",
-    expiresAt: null,
-    eligibility:
-      "Households in Sweden. The advice is free and impartial; you decide which measures to take.",
     category: "energy",
     verified: true,
     demo: false,

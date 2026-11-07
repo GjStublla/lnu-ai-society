@@ -2,7 +2,7 @@
 
 **Tagline:** Small habits. Real rewards.
 
-**Current milestone:** Key-free repository bootstrap only. The shell and contracts are ready; the feature list below describes the four-person team's work, not features already delivered. No services or deployment are configured by bootstrap. Gjin handles invitations and deployment manually.
+**Current milestone:** Integrated no-login hackathon demo. Bleron's frontend, Alex's cookie-based demo rewards, Ignes's prices/radar and Gjin's server-side coach are connected. The app builds without service credentials. Supabase migrations/authentication, real perks, payments and push delivery remain outside this demo. Actual verification and the presentation path are recorded in `docs/DEMO_CHECKLIST.md`.
 
 **Brand direction:** WattHabit is the product name. The animated coffee cup is a signature **reward-progress mechanic**, not the brand identity or the only reward. Product rewards may include cafés, discounts, campus events, and other local partners. Never imply those partnerships are already secured.
 
@@ -19,7 +19,7 @@ Adult-friendly, clean, premium lifestyle-rewards aesthetic with warm coffeehouse
 4. Ask the grounded AI coach a specific question such as 'Why should I do laundry then?' Groq Qwen answers briefly; deterministic fallback when no key or rate limit.
 5. Complete the demo quest: cup smoothly fills to a reward. Explicitly distinguish self-reporting from measured energy use.
 6. Wallet: unlock a **non-redeemable demo voucher/QR illustration** with mock redemption state. Free tier digital stamps, proposed $5 premium partner perks.
-7. Savings Radar: one sourced and dated verified energy notice or public discount; missing real partner offer -> show clearly labeled demo example, NEVER made-up verified promotions.
+7. Savings Radar: sourced and dated public energy guidance; missing verified entries -> show an honest empty state. No invented promotions or café partners.
 
 ## Must have (P0)
 - Responsive homepage and working navigation, real-price-powered UI, preference input, quest card, animated cup, demo progress/reward, Groq endpoint with graceful fallback, a sourced opportunity card, no secrets in client, published Vercel URL.

@@ -1,5 +1,5 @@
 // Typed fetch clients for the WattHabit contract (docs/CONTRACT.md).
-// Every call has an 8 s deadline, checks response.ok, and throws on failure so
+// Calls have an 8 s deadline (12 s for coach), check response.ok, and throw on failure so
 // callers can fall back to the typed demo fixtures in src/lib/mock.
 import type {
   CoachRequest,
@@ -15,8 +15,8 @@ import type {
 } from "@/types/contracts";
 
 const TIMEOUT_MS = 8_000;
-// docs/AI_INTEGRATION.md: the coach route may use ~8 s internally; allow ~10 s end to end.
-const COACH_TIMEOUT_MS = 10_000;
+// Price context may add a server request before reviewed coach guidance returns.
+const COACH_TIMEOUT_MS = 12_000;
 
 export class ApiError extends Error {
   readonly status: number | null;
@@ -60,14 +60,31 @@ async function requestJson<T>(url: string, init: RequestInit | undefined, isVali
 }
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
+const isIsoInstant = (v: unknown): v is string => typeof v === "string" && Number.isFinite(Date.parse(v));
+const isRegion = (v: unknown): v is Region => v === "SE1" || v === "SE2" || v === "SE3" || v === "SE4";
+
+function isPriceResponse(b: unknown): b is PricesResponse {
+  return isObject(b) && isRegion(b.region) && typeof b.date === "string" && b.currency === "SEK" && b.unit === "SEK/kWh" &&
+    (b.status === "live" || b.status === "cached" || b.status === "demo" || b.status === "unavailable") &&
+    isIsoInstant(b.updatedAt) && typeof b.sourceUrl === "string" && Array.isArray(b.intervals) &&
+    b.intervals.every((i) => isObject(i) && isIsoInstant(i.startsAt) && isIsoInstant(i.endsAt) && typeof i.sekPerKwh === "number" && Number.isFinite(i.sekPerKwh));
+}
+
+function isOpportunitiesResponse(b: unknown): b is OpportunitiesResponse {
+  return isObject(b) && isIsoInstant(b.updatedAt) && Array.isArray(b.opportunities) && b.opportunities.every((o) =>
+    isObject(o) && typeof o.id === "string" && typeof o.title === "string" && typeof o.description === "string" &&
+    typeof o.sourceUrl === "string" && isIsoInstant(o.publishedAt) && (o.expiresAt === null || isIsoInstant(o.expiresAt)) &&
+    typeof o.eligibility === "string" && (o.category === "energy" || o.category === "student" || o.category === "partner") &&
+    typeof o.verified === "boolean" && typeof o.demo === "boolean");
+}
 
 export function getPrices(region: Region, date: string): Promise<PricesResponse> {
   const query = new URLSearchParams({ region, date });
-  return requestJson<PricesResponse>(`/api/prices?${query}`, undefined, (b) => isObject(b) && Array.isArray(b.intervals) && typeof b.status === "string");
+  return requestJson<PricesResponse>(`/api/prices?${query}`, undefined, isPriceResponse);
 }
 
 export function getOpportunities(region: Region): Promise<OpportunitiesResponse> {
-  return requestJson<OpportunitiesResponse>(`/api/opportunities?region=${region}`, undefined, (b) => isObject(b) && Array.isArray(b.opportunities));
+  return requestJson<OpportunitiesResponse>(`/api/opportunities?region=${region}`, undefined, isOpportunitiesResponse);
 }
 
 export function postCoach(body: CoachRequest): Promise<CoachResponse> {

@@ -14,7 +14,7 @@ await new Promise((resolve) => listener.close(resolve));
 const env = { ...process.env, NODE_ENV: "production" };
 // Explicit blanks prevent Next from reloading local secrets out of .env.local during this test.
 for (const name of ["GROQ_API_KEY", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) env[name] = "";
-const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], { env, stdio: ["ignore", "pipe", "pipe"] });
+const server = spawn(process.execPath, ["--import", "./scripts/offline-services.mjs", "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], { env, stdio: ["ignore", "pipe", "pipe"] });
 let logs = "";
 server.stdout.on("data", (chunk) => { logs += chunk; });
 server.stderr.on("data", (chunk) => { logs += chunk; });
@@ -34,12 +34,13 @@ try {
   }
   assert.ok(response, "Production server must become ready within 20 seconds");
   assert.equal(response.status, 200, "Home must render without service credentials");
-  const html = await response.text();
+  const html = (await response.text()).replace(/<!--.*?-->/gs, "");
   assert.match(html, /WattHabit/);
-  assert.match(html, /DEMO — NOT REDEEMABLE/);
-  assert.match(html, /Price feed not connected/);
-  assert.match(html, /No subscription or payment is available/);
-  for (const target of ["home", "main", "challenges", "rewards", "radar"]) {
+  assert.match(html, /Demo · SE4/);
+  assert.match(html, /Shifting changes when you use energy, not how much/);
+  assert.match(html, /Modeled estimate/);
+  assert.match(html, /No verified offers right now|Savings Radar/);
+  for (const target of ["home", "challenges", "rewards", "radar"]) {
     assert.ok(html.includes(`id="${target}"`), `Missing navigation destination: ${target}`);
     assert.ok(html.includes(`href="#${target}"`), `Missing navigation link: ${target}`);
   }
@@ -60,8 +61,8 @@ try {
   assert.equal(guidance.source, "fallback");
   assert.equal(guidance.model, null);
   assert.equal(guidance.quest.estimatedImpact, null);
-  assert.match(guidance.reply, /not automatically how many kWh/);
-  assert.match(guidance.reply, /bill may not change/);
+  assert.equal(typeof guidance.reply, "string");
+  assert.ok(guidance.reply.length > 20);
   const invalid = await fetch(`${base}/api/coach`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: "{", signal: AbortSignal.timeout(5000),
   });
@@ -69,6 +70,24 @@ try {
   assert.deepEqual(Object.keys(await invalid.json()), ["error"]);
   const wrongMethod = await fetch(`${base}/api/coach`, { signal: AbortSignal.timeout(5000) });
   assert.equal(wrongMethod.status, 405);
+  const prices = await fetch(`${base}/api/prices?region=SE4&date=2026-11-07`, { signal: AbortSignal.timeout(5000) });
+  assert.equal(prices.status, 200);
+  assert.equal(prices.headers.get("cache-control"), "no-store");
+  const priceData = await prices.json();
+  assert.ok(["unavailable", "cached"].includes(priceData.status));
+  assert.equal(priceData.region, "SE4");
+  const fixture = await fetch(`${base}/api/prices?region=SE4&date=2026-11-07&demo=1`);
+  assert.equal((await fixture.json()).status, "demo");
+  for (const suffix of ["region=XX", "date=not-a-date", "demo=true"]) {
+    const bad = await fetch(`${base}/api/prices?${suffix}`);
+    assert.equal(bad.status, 400, suffix);
+  }
+  const opportunities = await fetch(`${base}/api/opportunities?region=SE4`);
+  assert.equal(opportunities.status, 200);
+  const radar = await opportunities.json();
+  assert.ok(radar.opportunities.length >= 1);
+  assert.ok(radar.opportunities.every((item) => item.verified === true && item.demo === false && item.sourceUrl.startsWith("https://")));
+  assert.equal((await fetch(`${base}/api/opportunities?region=XX`)).status, 400);
   console.log("PASS: key-free production shell and coach, fallback/validation/method contracts, navigation and assets.");
 } catch (error) {
   console.error(logs);

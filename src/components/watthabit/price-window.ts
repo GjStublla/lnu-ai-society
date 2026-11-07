@@ -1,5 +1,5 @@
 import type { PriceInterval } from "@/types/contracts";
-import { stockholmMinutesOfDay } from "@/lib/mock/time";
+import { findCheapestWindows } from "@/lib/energy/windows";
 
 export type PriceWindow = {
   startIndex: number;
@@ -20,46 +20,19 @@ export type QuestPlan = {
 export const ACTIVITY_DURATION_MIN: Record<string, number> = { laundry: 120, dishwasher: 120, charging: 60 };
 export const ASSUMED_KWH = 1;
 
-function sorted(intervals: PriceInterval[]): PriceInterval[] {
-  return intervals
-    .filter((i) => Number.isFinite(i.sekPerKwh) && !Number.isNaN(Date.parse(i.startsAt)) && !Number.isNaN(Date.parse(i.endsAt)))
-    .slice()
-    .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
-}
-
-/** Time-weighted contiguous window starting at index i, or null if it doesn't fit. */
-function windowAt(list: PriceInterval[], i: number, durationMs: number): PriceWindow | null {
-  let elapsed = 0;
-  let weighted = 0;
-  let j = i;
-  while (j < list.length && elapsed < durationMs) {
-    if (j > i && Date.parse(list[j].startsAt) !== Date.parse(list[j - 1].endsAt)) return null;
-    const len = Date.parse(list[j].endsAt) - Date.parse(list[j].startsAt);
-    if (len <= 0) return null;
-    elapsed += len;
-    weighted += list[j].sekPerKwh * len;
-    j += 1;
-  }
-  if (elapsed < durationMs) return null;
-  return { startIndex: i, endIndex: j, startsAt: list[i].startsAt, endsAt: list[j - 1].endsAt, avgSekPerKwh: weighted / elapsed };
-}
-
-/** Cheapest contiguous window that starts at/after the user's available time (Stockholm). */
-export function planQuest(intervals: PriceInterval[], availableAfterMin: number | null, durationMinutes: number): { list: PriceInterval[]; plan: QuestPlan | null } {
-  const list = sorted(intervals);
-  const durationMs = durationMinutes * 60_000;
-  let baseline: PriceWindow | null = null;
-  let cheapest: PriceWindow | null = null;
-  for (let i = 0; i < list.length; i += 1) {
-    if (availableAfterMin !== null && stockholmMinutesOfDay(list[i].startsAt) < availableAfterMin) continue;
-    const w = windowAt(list, i, durationMs);
-    if (!w) continue;
-    if (!baseline) baseline = w;
-    if (!cheapest || w.avgSekPerKwh < cheapest.avgSekPerKwh) cheapest = w;
-  }
-  if (!baseline || !cheapest) return { list, plan: null };
-  return {
-    list,
-    plan: { cheapest, baseline, durationMinutes, estimatedDiffSek: (baseline.avgSekPerKwh - cheapest.avgSekPerKwh) * ASSUMED_KWH },
+/** UI-compatible adapter around the shared, DST-safe energy window engine. */
+export function planQuest(intervals: PriceInterval[], availableAfterMin: number | null, durationMinutes: number, now = new Date()): { list: PriceInterval[]; plan: QuestPlan | null } {
+  const list = intervals.filter((i) => Number.isFinite(i.sekPerKwh) && Number.isFinite(Date.parse(i.startsAt)) && Number.isFinite(Date.parse(i.endsAt)))
+    .slice().sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
+  const availableAfter = availableAfterMin === null ? null : `${String(Math.floor(availableAfterMin / 60)).padStart(2, "0")}:${String(availableAfterMin % 60).padStart(2, "0")}`;
+  const windows = findCheapestWindows(list, { durationMinutes: durationMinutes as 60 | 90 | 120, availableAfter, now, maxResults: 100 });
+  if (!windows.length) return { list, plan: null };
+  const toWindow = (w: (typeof windows)[number]): PriceWindow => {
+    const startIndex = list.findIndex((i) => Date.parse(i.startsAt) === Date.parse(w.startsAt));
+    const endIndex = list.findIndex((i) => Date.parse(i.endsAt) === Date.parse(w.endsAt)) + 1;
+    return { startIndex, endIndex, startsAt: w.startsAt, endsAt: w.endsAt, avgSekPerKwh: w.averageSekPerKwh };
   };
+  const cheapest = toWindow(windows[0]);
+  const baseline = toWindow(windows.reduce((first, candidate) => Date.parse(candidate.startsAt) < Date.parse(first.startsAt) ? candidate : first));
+  return { list, plan: { cheapest, baseline, durationMinutes, estimatedDiffSek: baseline.avgSekPerKwh - cheapest.avgSekPerKwh } };
 }

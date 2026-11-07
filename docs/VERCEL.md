@@ -1,5 +1,8 @@
 # Vercel — owned by Gjin
 
+## Integrated demo
+The existing project serves https://lnu-ai-society.vercel.app and follows `main`. Groq configuration was entered privately in Vercel; no key belongs in Git or client bundles. After the integration merge, wait for that commit's deployment to become ready, then run the production acceptance commands in `docs/DEMO_CHECKLIST.md`. Supabase migrations/authentication remain a separate unverified setup; they are not a dependency of the cookie/local no-login demo. The original bootstrap instructions below are retained as setup reference, not a claim that the current deployment is still only a shell.
+
 **Manual action required:** Bootstrap does not create accounts, invite users, connect a Vercel project or deploy. The shell can be deployed with all optional variables blank. Do not wait for Groq or Supabase to share the first shell URL.
 
 1. After the bootstrap commit reaches `main`, visit https://vercel.com/new and import `GjStublla/lnu-ai-society`. Framework should be detected as **Next.js**. Root directory is repository root.
