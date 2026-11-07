@@ -9,6 +9,7 @@ import { formatStockholmDay, formatStockholmTime, stockholmHour } from "@/lib/mo
 import { cn } from "@/lib/utils";
 import { isDemoDay, isUsable, windowText, type DayPlan, type PriceDay, type PriceLevel, type ReminderRow, type Suggestion } from "./advice";
 import { ASSUMED_KWH } from "./price-window";
+import { InfoTip } from "./info-tip";
 import { PriceStrip } from "./price-strip";
 
 /* ---------- Greeting + live price status ---------- */
@@ -59,7 +60,7 @@ export function TodayHeader({ nowMs, today, now }: { nowMs: number | null; today
           </span>
         )}
       </div>
-      {today?.fallback && <p className="mt-2 text-xs text-muted-foreground">Price feed not connected — showing a demo price curve, not market data.</p>}
+      {today?.fallback && <p className="mt-2 text-xs text-muted-foreground">Price feed not connected · demo prices</p>}
     </div>
   );
 }
@@ -134,75 +135,55 @@ export function AdviceCard({
   let eyebrow: string;
   let title: string;
   let big: string | null = null;
-  let why: string;
-  let estimate: string;
-  let note: string | null = null;
+  let metric: string;
+  let info: string;
   let Icon: typeof Plug = Zap;
 
   if (suggestion.kind === "price") {
     const { plan } = suggestion.plan;
     const label = ACTIVITY_LABEL[suggestion.activity];
-    eyebrow = "Happy hour";
-    title = `${label.name} happy hour ${suggestion.plan.dayWord}`;
+    eyebrow = `Happy hour · ${suggestion.plan.dayWord}`;
+    title = `${label.name} happy hour`;
     big = windowText(plan);
-    why = `Spot price ≈ ${plan.cheapest.avgSekPerKwh.toFixed(2)} SEK/kWh vs ${plan.baseline.avgSekPerKwh.toFixed(2)} if you start at ${formatStockholmTime(plan.baseline.startsAt)}.${isDemoDay(suggestion.plan.source) ? " Demo prices." : ""}`;
-    estimate = `Estimate: ≈ ${plan.estimatedDiffSek.toFixed(2)} SEK lower spot cost per ${label.unit} (assumes ~${ASSUMED_KWH} kWh, before VAT and fees). Same kWh, better time.`;
-    note = HOUSING_NOTE[housing];
+    metric = `≈ −${plan.estimatedDiffSek.toFixed(2)} SEK est.`;
+    info = `Spot ≈ ${plan.cheapest.avgSekPerKwh.toFixed(2)} SEK/kWh vs ${plan.baseline.avgSekPerKwh.toFixed(2)} if you start at ${formatStockholmTime(plan.baseline.startsAt)}${isDemoDay(suggestion.plan.source) ? " (demo prices)" : ""}. Estimate assumes ~${ASSUMED_KWH} kWh per ${label.unit}, spot price only, before VAT and fees. Same kWh, better time. ${HOUSING_NOTE[housing]}`;
   } else if (suggestion.kind === "habit") {
     const h = suggestion.habit;
     Icon = HABIT_ICON[h.id];
-    eyebrow = "Habit challenge";
+    eyebrow = "Habit";
     title = h.title;
-    why = h.line;
-    estimate = `Modeled estimate: ≈ ${h.kwhPerDay.toFixed(2)} kWh less per day (${h.assumption}). Self-reported, not measured.`;
+    metric = `${h.watts} W · −${h.kwhPerDay.toFixed(2)} kWh/day est.`;
+    info = `${h.line} Modeled estimate: ${h.assumption}. Self-reported, not measured.`;
   } else {
     Icon = BookOpen;
     eyebrow = "Learn";
-    title = "Shifting ≠ saving kWh";
-    why = "Moving a load changes when you use electricity, not how much.";
-    estimate = "A wash at 22:00 uses about the same kWh as at 18:00 — only the price per kWh can differ.";
+    title = "Shifting ≠ saving";
+    metric = "20-sec read";
+    info = "Moving a load changes when you use electricity, not how much. A wash at 22:00 uses about the same kWh as at 18:00 — only the price per kWh can differ.";
   }
 
   return (
     <article
-      className="relative overflow-hidden rounded-[24px] border border-border bg-card p-5 shadow-[0_1px_2px_rgb(16_32_29/0.05),0_18px_40px_-24px_rgb(16_32_29/0.35)]"
+      className="relative rounded-[24px] border border-border bg-card p-5 shadow-[0_1px_2px_rgb(16_32_29/0.05),0_18px_40px_-24px_rgb(16_32_29/0.35)]"
       aria-labelledby="advice-title"
     >
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span className="grid size-6 place-items-center rounded-md bg-primary text-primary-foreground" aria-hidden="true">
-          <Zap className="size-3.5" />
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+            isPrice ? "bg-energy text-energy-ink" : "bg-accent text-accent-foreground",
+          )}
+        >
+          <Icon className="size-3.5" aria-hidden="true" />
+          {eyebrow}
         </span>
-        <span className="font-medium text-foreground">WattHabit</span>
-        <span aria-hidden="true">·</span>
-        <span>Today&apos;s advice</span>
+        <InfoTip label={`About: ${title}`}>{info}</InfoTip>
       </div>
-
-      <div className="mt-4 flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold",
-              isPrice ? "bg-energy text-energy-ink" : "bg-accent text-accent-foreground",
-            )}
-          >
-            <Icon className="size-3.5" aria-hidden="true" />
-            {eyebrow}
-          </span>
-          <h2 id="advice-title" className="mt-2.5 text-[20px] leading-snug font-semibold tracking-tight">
-            {title}
-          </h2>
-          {big && <p className="mt-0.5 text-[30px] leading-tight font-semibold tracking-tight tabular-nums">{big}</p>}
-        </div>
-      </div>
-
-      <p className="mt-2 text-[15px] leading-relaxed text-foreground/85">{why}</p>
-      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{estimate}</p>
-      {note && (
-        <p className="mt-2 flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
-          <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          {note}
-        </p>
-      )}
+      <h2 id="advice-title" className="mt-2 text-[20px] leading-snug font-semibold tracking-tight">
+        {title}
+      </h2>
+      {big && <p className="text-[32px] leading-tight font-semibold tracking-tight tabular-nums">{big}</p>}
+      <p className="mt-2 inline-flex rounded-full bg-muted px-3 py-1 text-sm font-semibold tabular-nums">{metric}</p>
 
       <AnimatePresence mode="wait" initial={false}>
         {state.accepted ? (
@@ -215,10 +196,10 @@ export function AdviceCard({
                 ? `Reminder set for ${tomorrow ? "tomorrow " : ""}${suggestion.plan.reminderAt}`
                 : suggestion.kind === "habit"
                   ? "Accepted for today"
-                  : "Read it, then stamp it"}
+                  : "Accepted"}
             </p>
             {tomorrow ? (
-              <p className="mt-3 text-sm text-muted-foreground">Come back tomorrow to stamp it — or pick a habit challenge today.</p>
+              <p className="mt-3 text-sm text-muted-foreground">Stamp it tomorrow.</p>
             ) : (
               <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
                 <Button className="h-12 rounded-full text-[15px] font-semibold" onClick={onDone}>
@@ -298,7 +279,7 @@ export function PriceStripCard({ plan, today, nowMs, onRetry, onUseDemo }: { pla
         rel="noopener noreferrer"
         className="mt-1 inline-flex min-h-9 items-center gap-1 text-[11px] text-muted-foreground underline-offset-4 hover:underline"
       >
-        Source: Elpriset just nu · {source.fallback ? "demo" : source.data.status} · Europe/Stockholm
+        Source
         <ArrowUpRight className="size-3" aria-hidden="true" />
         <span className="sr-only">(opens in a new tab)</span>
       </a>
@@ -312,15 +293,16 @@ export function UpcomingReminders({ rows, onPreview }: { rows: ReminderRow[]; on
   return (
     <section aria-labelledby="reminders-title" className="rounded-[22px] border border-border bg-card p-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 id="reminders-title" className="text-sm font-semibold">
+        <h2 id="reminders-title" className="flex items-center text-sm font-semibold">
           Upcoming reminders
+          <InfoTip label="About reminders">In-app reminders while WattHabit is open. Accept a challenge to add one. Push notifications are coming later.</InfoTip>
         </h2>
         <Button variant="ghost" className="h-10 rounded-full px-3 text-primary" onClick={onPreview}>
           <BellRing aria-hidden="true" /> Preview reminder
         </Button>
       </div>
       {rows.length === 0 ? (
-        <p className="mt-1 text-sm text-muted-foreground">No reminders yet. Accept a challenge to get an in-app reminder.</p>
+        <p className="mt-1 text-sm text-muted-foreground">No reminders yet</p>
       ) : (
         <ul className="mt-1 divide-y divide-border">
           {rows.map((r) => (
@@ -339,7 +321,6 @@ export function UpcomingReminders({ rows, onPreview }: { rows: ReminderRow[]; on
           ))}
         </ul>
       )}
-      <p className="mt-2 text-[11px] text-muted-foreground">In-app reminders while WattHabit is open. Push notifications are coming later.</p>
     </section>
   );
 }

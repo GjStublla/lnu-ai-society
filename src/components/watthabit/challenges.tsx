@@ -4,14 +4,16 @@ import { AnimatePresence, motion } from "motion/react";
 import { BookOpen, Check, Flame, Lightbulb, Monitor, Plug, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { InfoTip } from "./info-tip";
 
 export type ChallengeCardModel = {
   id: string;
   kind: "price" | "habit" | "learn";
   title: string;
-  line: string;
-  estimateLabel: string;
-  estimate: string;
+  /** One inline metric chip, e.g. "60 W · −0.48 kWh/day est." */
+  metric: string;
+  /** Assumptions/disclaimers, shown only in the (i) popover. */
+  info: string;
   accepted: boolean;
   done: boolean;
   canAccept: boolean;
@@ -39,19 +41,15 @@ function ChallengeCard({ c, onAccept, onDone, onWhy }: { c: ChallengeCardModel; 
         </span>
         <div className="min-w-0 flex-1">
           <h3 className="text-[15px] font-semibold">{c.title}</h3>
-          <p className="mt-0.5 text-sm leading-snug text-muted-foreground">{c.line}</p>
+          <p className="mt-1 inline-flex rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold tabular-nums">{c.metric}</p>
         </div>
-      </div>
-
-      <div className="mt-3 rounded-xl bg-muted px-3 py-2">
-        <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">{c.estimateLabel}</p>
-        <p className="mt-0.5 text-xs leading-relaxed text-foreground/80">{c.estimate}</p>
+        <InfoTip label={`About: ${c.title}`}>{c.info}</InfoTip>
       </div>
 
       {c.kind === "learn" && (
         <details className="group mt-2 rounded-xl px-1 text-sm">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between font-medium [&::-webkit-details-marker]:hidden">
-            Read the 20-second lesson
+            Read the lesson
             <span className="text-lg leading-none text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">
               +
             </span>
@@ -123,29 +121,19 @@ export function ChallengesSection({
 }) {
   return (
     <>
-      <div className="mb-3 flex items-center gap-3 rounded-[22px] border border-border bg-card p-4">
-        <span className={cn("grid size-11 shrink-0 place-items-center rounded-full", streak > 0 ? "bg-accent text-primary" : "bg-muted text-muted-foreground")} aria-hidden="true">
-          <Flame className="size-5" />
+      <p className="mb-3 flex items-center gap-2 rounded-[22px] border border-border bg-card px-4 py-3 text-[15px] font-semibold">
+        <Flame className={cn("size-5", streak > 0 ? "text-primary" : "text-muted-foreground")} aria-hidden="true" />
+        {streak > 0 ? `${streak}-day streak` : "No streak yet"}
+        <span className="text-muted-foreground" aria-hidden="true">·</span>
+        <span className="tabular-nums">
+          {doneToday}/{cards.length} today
         </span>
-        <div className="flex-1">
-          <p className="text-[15px] font-semibold">{streak > 0 ? `${streak}-day streak` : "Start a streak today"}</p>
-          <p className="text-xs text-muted-foreground">One completed challenge a day keeps it going.</p>
-        </div>
-        <p className="text-right text-xs text-muted-foreground">
-          <span className="block text-lg font-semibold text-foreground tabular-nums">
-            {doneToday}/{cards.length}
-          </span>
-          done today
-        </p>
-      </div>
+      </p>
       <ul className="space-y-3">
         {cards.map((c) => (
           <ChallengeCard key={c.id} c={c} onAccept={() => onAccept(c.id)} onDone={() => onDone(c.id)} onWhy={() => onWhy(c.id)} />
         ))}
       </ul>
-      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Self-reported. Each challenge counts once per Stockholm day. Estimates are modeled with the stated assumptions, never measured.
-      </p>
     </>
   );
 }

@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { InfoTip } from "./info-tip";
 import { Mug } from "./mug";
 
 export function StampDots({ progress, goal, exampleStamps, size = "sm" }: { progress: number; goal: number; exampleStamps: number; size?: "sm" | "lg" }) {
@@ -86,7 +87,6 @@ type RewardProgressProps = {
 /** Compact Today widget — a small part of the screen, not the hero. */
 export function RewardWidget({ progress, goal, exampleStamps, dropKey, celebrateKey }: RewardProgressProps) {
   const full = progress >= goal;
-  const remaining = Math.max(0, goal - progress);
   return (
     <section aria-labelledby="reward-widget-title" className="flex items-center gap-4 rounded-[22px] border border-border bg-card p-4 shadow-[0_1px_2px_rgb(16_32_29/0.04)]">
       <div className="relative w-[72px] shrink-0">
@@ -96,7 +96,7 @@ export function RewardWidget({ progress, goal, exampleStamps, dropKey, celebrate
       </div>
       <div className="min-w-0 flex-1">
         <h2 id="reward-widget-title" className="text-[15px] font-semibold">
-          {full ? "Reward unlocked" : `${progress}/${goal} to your next reward`}
+          {full ? "Reward unlocked" : `${progress}/${goal} to next reward`}
         </h2>
         <p className="sr-only" aria-live="polite">
           {progress} of {goal} stamps.
@@ -104,9 +104,6 @@ export function RewardWidget({ progress, goal, exampleStamps, dropKey, celebrate
         <div className="mt-2">
           <StampDots progress={progress} goal={goal} exampleStamps={exampleStamps} />
         </div>
-        <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-          {full ? "A demo voucher is in your wallet." : `${remaining} more ${remaining === 1 ? "challenge" : "challenges"} · stamps count participation, not measured savings`}
-        </p>
       </div>
       <a href="#rewards" className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Open rewards">
         <ChevronRight className="size-5" aria-hidden="true" />
@@ -125,13 +122,13 @@ export function RewardHero({ progress, goal, exampleStamps, dropKey, celebrateKe
         <StampDrop dropKey={dropKey} />
         <Celebration celebrateKey={celebrateKey} />
       </div>
-      <p className="mt-3 text-lg font-semibold tracking-tight">{full ? "Reward unlocked" : `${progress}/${goal} to your next reward`}</p>
-      <div className="mt-3">
+      <p className="mt-3 flex items-center gap-1 text-lg font-semibold tracking-tight">
+        {full ? "Reward unlocked" : `${progress}/${goal} to next reward`}
+        <InfoTip label="About stamps">Stamps count self-reported participation, not measured savings. The first {exampleStamps} are example stamps.</InfoTip>
+      </p>
+      <div className="mt-2">
         <StampDots progress={progress} goal={goal} exampleStamps={exampleStamps} size="lg" />
       </div>
-      <p className="mt-3 max-w-[30ch] text-xs leading-relaxed text-muted-foreground">
-        Stamps count participation, not measured savings. The first {exampleStamps} are example stamps.
-      </p>
     </div>
   );
 }
