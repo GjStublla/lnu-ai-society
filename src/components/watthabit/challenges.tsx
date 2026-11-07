@@ -28,7 +28,7 @@ const ICONS: Record<string, typeof Zap> = { price: Zap, "standby-30w": Plug, "co
 function ChallengeCard({ c, onAccept, onDone, onWhy }: { c: ChallengeCardModel; onAccept: () => void; onDone: () => void; onWhy: () => void }) {
   const Icon = ICONS[c.id] ?? Zap;
   return (
-    <li className={cn("list-none rounded-[22px] border bg-card p-4 transition-colors", c.done ? "border-primary/25" : "border-border")}>
+    <li className={cn("flex list-none flex-col rounded-[22px] border bg-card p-4 transition-colors", c.done ? "border-primary/25" : "border-border")}>
       <div className="flex items-start gap-3">
         <span
           className={cn(
@@ -62,7 +62,7 @@ function ChallengeCard({ c, onAccept, onDone, onWhy }: { c: ChallengeCardModel; 
         </details>
       )}
 
-      <div className="mt-3">
+      <div className="mt-auto pt-3">
         <AnimatePresence mode="wait" initial={false}>
           {c.done ? (
             <motion.p key="done" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
@@ -129,7 +129,7 @@ export function ChallengesSection({
           {doneToday}/{cards.length} today
         </span>
       </p>
-      <ul className="space-y-3">
+      <ul className="challenge-grid">
         {cards.map((c) => (
           <ChallengeCard key={c.id} c={c} onAccept={() => onAccept(c.id)} onDone={() => onDone(c.id)} onWhy={() => onWhy(c.id)} />
         ))}

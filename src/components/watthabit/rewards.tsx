@@ -24,7 +24,7 @@ export function BadgesRow({ earned }: { earned: Set<string> }) {
           {count}/{BADGES.length} earned
         </p>
       </div>
-      <ul className="no-scrollbar -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1">
+      <ul className="no-scrollbar relative -mx-4 mt-3 flex justify-between gap-3 overflow-x-auto px-4 pb-1">
         {BADGES.map((b) => {
           const on = earned.has(b.id);
           const Icon = BADGE_ICON[b.id];
@@ -118,7 +118,7 @@ export function VoucherCard({
         )}
       </AnimatePresence>
 
-      <p className="relative mt-3 min-h-4 text-[11px] text-white/80" aria-live="polite">
+      <p className="relative mt-3 text-[11px] text-white/80 empty:mt-0" aria-live="polite">
         {message}
       </p>
     </article>
