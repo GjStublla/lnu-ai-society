@@ -2,7 +2,7 @@
 
 This is the **single source of truth**, mirrored as TypeScript types in `src/types/contracts.ts`. All timestamps are ISO8601 with offsets; display in `Europe/Stockholm`. All energy prices are **SEK/kWh**, not öre/kWh. The app must handle unavailable services gracefully. Prefer JSON. Validation belongs on the server.
 
-**Bootstrap status:** These are agreed interfaces, not implemented endpoints. The initial shell makes no API calls. Owners add their routes in separate PRs; frontend mocks must conform to these types. Import types with `import type` and do not create parallel response definitions. Existing success shapes are preserved; only Gjin may approve changes.
+**Implementation status:** `/api/coach` is implemented on Gjin's AI feature branch; prices, opportunities and reward routes remain their owners' work. The initial shell makes no API calls until Bleron connects it. Frontend mocks must conform to these types. Import types with `import type` and do not create parallel response definitions. Existing success shapes are preserved; only Gjin may approve changes.
 
 ## Transport and validation
 - All routes return JSON. Valid requests use HTTP 200, including documented demo/unavailable/fallback responses. Wrong method: 405. Invalid region/date/JSON/body: HTTP 400 with `ApiErrorResponse = { error: string }`; show useful bounded text without private provider errors. Frontend checks `response.ok` before treating JSON as a success type.
@@ -50,6 +50,8 @@ Only the server can call Groq. Preferred model configurable `GROQ_MODEL=qwen/qwe
 Treat **all client input, including priceSummary**, as untrusted. Recompute or verify price facts against Ignes's server data before grounding AI; otherwise ignore the summary and offer sourced general guidance. `message`: trimmed 1–1200 characters; `activities`: at most 3 entries from `laundry|dishwasher|charging`; `availableAfter`: local `HH:mm` or null. Region/housing use their enums. `priceSummary:null` means absent. Validate paired ISO window timestamps/order if a summary is supplied. Bound request size and reject malformed bodies; do not forward arbitrary nested values to the provider.
 
 `Quest.evidenceSource` is the evidence URL (HTTPS allowlisted/verified source) or null. Unsupported numeric impacts stay null; a non-null `EstimatedImpact` requires explicit assumptions. Never interpret shifted kWh as avoided kWh. `source:'fallback', model:null` marks deterministic guidance; a provider reply names the actual successful model. The model cannot create rewards or validate completion. The coach has no tool for payments or real voucher issuance.
+
+**Current coach slice:** see `docs/AI_INTEGRATION.md`. Client summaries are validated then discarded; no trusted live price adapter exists yet. Groq selects a reviewed topic, while the server owns visible text, evidence and participation-planning quests; label this as AI-selected reviewed guidance. Impacts stay null. Missing summary may be omitted and is normalized to the canonical null value. Invalid inputs use HTTP 400; valid fallback uses 200/no-store. No key or live provider is required for build/tests.
 
 ## 4. Progress and rewards (Alex)
 `POST /api/challenges/complete` request: `CompleteChallengeRequest = { challengeId: string }` and response:

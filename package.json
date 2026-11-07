@@ -2,8 +2,9 @@
   "name": "watthabit",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -11,7 +12,10 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node scripts/smoke.mjs"
+    "test": "npm run test:coach && npm run test:smoke",
+    "test:coach": "node --conditions=react-server --experimental-strip-types --test src/lib/ai/*.test.ts",
+    "test:smoke": "node scripts/smoke.mjs",
+    "check:groq": "node --conditions=react-server --experimental-strip-types scripts/check-groq-models.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

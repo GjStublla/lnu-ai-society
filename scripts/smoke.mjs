@@ -1,4 +1,4 @@
-// Production shell smoke test. Run `npm run build` first; no live services required.
+// Production HTTP smoke test. Run `npm run build` first; no live services required.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
@@ -12,7 +12,8 @@ const { port } = listener.address();
 await new Promise((resolve) => listener.close(resolve));
 
 const env = { ...process.env, NODE_ENV: "production" };
-for (const name of ["GROQ_API_KEY", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) delete env[name];
+// Explicit blanks prevent Next from reloading local secrets out of .env.local during this test.
+for (const name of ["GROQ_API_KEY", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]) env[name] = "";
 const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], { env, stdio: ["ignore", "pipe", "pipe"] });
 let logs = "";
 server.stdout.on("data", (chunk) => { logs += chunk; });
@@ -48,7 +49,27 @@ try {
   assert.equal(css.status, 200, "Production stylesheet must load");
   const icon = await fetch(`${base}/icon.svg`, { signal: AbortSignal.timeout(5000) });
   assert.equal(icon.status, 200, "App icon must load");
-  console.log("PASS: key-free production home, demo disclosures, navigation, CSS and icon.");
+  const coach = await fetch(`${base}/api/coach`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ region: "SE4", housing: "included", activities: ["laundry"], availableAfter: null, priceSummary: null, message: "Can I save kWh by moving laundry?" }),
+    signal: AbortSignal.timeout(5000),
+  });
+  assert.equal(coach.status, 200, "Coach must work without a key");
+  assert.equal(coach.headers.get("cache-control"), "no-store");
+  const guidance = await coach.json();
+  assert.equal(guidance.source, "fallback");
+  assert.equal(guidance.model, null);
+  assert.equal(guidance.quest.estimatedImpact, null);
+  assert.match(guidance.reply, /not automatically how many kWh/);
+  assert.match(guidance.reply, /bill may not change/);
+  const invalid = await fetch(`${base}/api/coach`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: "{", signal: AbortSignal.timeout(5000),
+  });
+  assert.equal(invalid.status, 400, "Malformed JSON must return validation error");
+  assert.deepEqual(Object.keys(await invalid.json()), ["error"]);
+  const wrongMethod = await fetch(`${base}/api/coach`, { signal: AbortSignal.timeout(5000) });
+  assert.equal(wrongMethod.status, 405);
+  console.log("PASS: key-free production shell and coach, fallback/validation/method contracts, navigation and assets.");
 } catch (error) {
   console.error(logs);
   throw error;

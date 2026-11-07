@@ -2,7 +2,7 @@
 
 **WattHabit — Small habits. Real rewards.** A student energy-habit and rewards app. Coffee cup fill is one progress treatment; rewards can extend to student discounts and events.
 
-The bootstrap is a runnable Next.js App Router shell with TypeScript, Tailwind, shadcn/ui primitives, Lucide, Motion and canonical API types. It works without API keys, login, Supabase or network data. Navigation uses real in-page destinations; the expandable explanation is written preview guidance. Cup progress is an illustration. Feature endpoints, saved progress, onboarding and live AI are deliberately left to their owners; they are not implemented yet.
+The starter is a runnable Next.js App Router shell with TypeScript, Tailwind, shadcn/ui primitives, Lucide, Motion and canonical API types. It works without API keys, login, Supabase or network data. Gjin's `/api/coach` now supplies validated, sourced guidance with Groq topic selection when configured and transparent written fallback otherwise; [AI integration handoff](docs/AI_INTEGRATION.md) explains the boundaries and setup. The shell remains Bleron's preview until he connects it. Live price/reward APIs, saved progress and onboarding remain their owners' work.
 
 - Project: `PROJECT.md`
 - Agent rules: `AGENTS.md`
@@ -27,7 +27,7 @@ npm run lint
 npm run build
 npm test
 ```
-`npm test` starts an isolated production server, checks key-free rendering, navigation targets, demo labels, CSS and icon, then stops it. Build first. This is a bootstrap smoke test, not coverage of future API logic. CI runs these commands on main and PRs. Use `npm start` to serve a built app yourself.
+`npm test` runs coach unit/HTTP-handler tests and the production smoke check. Build first. `npm run test:coach` runs just feature tests; `npm run test:smoke` starts an isolated built server and checks key-free rendering, navigation, assets and the coach's fallback/error contract, then stops it. No provider calls are made by tests. CI runs these commands on main and PRs. Use `npm start` to serve a built app yourself. Recommended Node 24; native feature tests require Node >=22.18.
 
 ## Team start
 Accept Gjin's GitHub invitation, clone, run `npm ci`, then switch to your assigned prepared branch. Bleron's `feature/frontend`, Alex's `feature/backend` and Ignes's `feature/energy` are prepared from the bootstrap on Gjin's request. Gjin creates his own `feature/ai-integration` when starting AI work. Exact commands and prompt paths: [docs/TEAM.md](docs/TEAM.md). Gjin coordinates dependency/lockfile, layout and contract changes.
