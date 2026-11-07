@@ -1,0 +1,98 @@
+WattHabit: four-minute pitch
+
+Slide 1: Your laundry has a happy hour.
+0:00–0:25 / Gjin
+
+"Your laundry has a happy hour tomorrow."
+
+Imagine opening that reminder instead of another electricity graph.
+
+Choose a better time, complete a small challenge, and watch your virtual coffee cup fill up.
+
+That's WattHabit. We make better energy habits easier to start, and more rewarding to repeat.
+
+Demo cue: Start on the hook. Pause after 'tomorrow'. The cup represents participation progress. The reminder concept is delivered in-app today, not through push.
+
+---
+
+Slide 2: Students have enough to keep track of.
+0:25–0:55 / Team
+
+Students have busy lives. Comparing electricity prices is rarely a priority. And when electricity is included in rent, a cheaper washing cycle doesn't change your own bill.
+
+Last week on campus, an organization was offering 100 kronor off electricity. But you had to hear about it.
+
+WattHabit brings useful next steps, visible progress, and a place to discover energy information.
+
+Demo cue: Keep the campus example as your own anecdote. Don't name an organization or add eligibility details you don't know. Current Radar cards are sourced public guidance.
+
+---
+
+Slide 3: Here's how it works.
+0:55–1:55 / Demo presenter
+
+Here's what we've built. Choose your region, billing situation, activities, and availability. WattHabit finds a lower-price window that fits your routine.
+
+The mug shows your participation progress. Accept the suggestion, skip it, or tap Chat in the bottom bar to ask why. Here is the in-app reminder preview.
+
+We also suggest habits that reduce unnecessary consumption. I'll complete two example challenges: the cup fills, and a demo reward unlocks.
+
+The cup fills as you collect stamps. Those stamps count self-reported participation, not measured electricity savings. This voucher is a demo, not redeemable.
+
+Demo cue: Allow about 25 seconds for clicks. Offline: show Today, then Reminder, then Reward. Live: start at 3/5, show the mug and price recommendation. Open Ask WattHabit in the first section or Chat in the bottom bar. Ask "Why should I move laundry?" Close chat, preview the reminder, then complete two DIFFERENT habit challenges and open Rewards. Don't rely on completing tomorrow's laundry quest today. Prices may be cached; keep the source/status visible.
+
+---
+
+Slide 4: Real prices. Advice that fits your day.
+1:55–2:25 / Technical presenter
+
+We built WattHabit with Next.js and TypeScript. It checks real Swedish prices in fifteen-minute intervals and finds a complete window for your activity.
+
+Qwen, through Groq, helps choose a short, reviewed explanation. If AI is unavailable, written guidance keeps the app working.
+
+We also analyzed four weeks of synthetic data from eight flats and twenty-five fictional students. That helped us focus on background use, lighting, and flexible timing.
+
+Demo cue: The AI doesn't invent prices or savings. Server calculations verify price facts. The synthetic dataset informs scenario design and is separate from the live price feed.
+
+---
+
+Slide 5: Three habits. About 11% in one modeled scenario.
+2:25–3:10 / Ignes
+
+What could the habits save? In this annual illustration, we switch off a separate standby device, put an unused computer setup to sleep, and turn off unused lights.
+
+With the assumptions shown here, that's 108 kilowatt-hours per student per year. Against an illustrative 1,000-kilowatt-hour baseline, it's almost eleven percent.
+
+At two kronor per kilowatt-hour, that's 216 kronor.
+
+These are modeled opportunities. Moving laundry may save extra money on a matching tariff, but it doesn't reduce electricity use by itself.
+
+Demo cue: Keep the assumptions and illustrative baseline visible. The app's daily examples use longer durations than this annual illustration. Carbon can stay on the slide; don't spend time reading every number. If challenged, open 'View assumptions & sources'.
+
+---
+
+Slide 6: Good habits stay free. Plus adds local perks.
+3:10–3:40 / Business presenter
+
+The energy guidance stays free. That includes price windows, reminders, coaching, challenges, digital achievements, and Savings Radar.
+
+We're planning a Plus tier at around five dollars a month, with future partner perks like coffee offers and student experiences.
+
+So there's a reason to take part even when electricity is in your rent. We'll need local partners and clear offer limits to make those perks work.
+
+Demo cue: Sell Plus on the value of future local perks, not a promise that 216 kronor of modeled electricity savings pays for a subscription. Pricing is a hypothesis. No paid subscription or merchant partnership is live.
+
+---
+
+Slide 7: Small habits. Real rewards.
+3:40–4:00 / Gjin
+
+A better energy habit should fit into student life.
+
+WattHabit gives students a useful next step and a reason to come back tomorrow.
+
+Our next step is a campus pilot and our first local partners.
+
+WattHabit. Small habits. Real rewards.
+
+Demo cue: Finish on time. Leave the QR code and demo address visible for judges. The pilot and first partnerships are next steps, not completed milestones.

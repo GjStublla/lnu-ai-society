@@ -33,18 +33,20 @@ const LEVEL_STYLE: Record<PriceLevel, string> = {
 export function TodayHeader({ nowMs, today, now }: { nowMs: number | null; today: PriceDay | null; now: { level: PriceLevel; price: number } | null }) {
   const status: DataStatus | null = today ? (today.fallback ? "demo" : today.data.status) : null;
   return (
-    <div>
+    <div className="today-heading">
+      <div>
       <p className="text-sm text-muted-foreground">
         {nowMs === null ? "Today" : formatStockholmDay(nowMs)}
       </p>
-      <h1 id="home-title" className="mt-0.5 text-[28px] leading-tight font-semibold tracking-tight">
+      <h1 id="home-title" className="mt-1 text-[30px] leading-tight font-semibold tracking-[-0.04em] sm:text-[40px]">
         {greetingFor(nowMs)}
       </h1>
-      <div className="mt-3 flex flex-wrap items-center gap-2" role="status" aria-live="polite">
+      </div>
+      <div className="flex flex-wrap items-center gap-2" role="status" aria-live="polite">
         {today === null ? (
           <span className="inline-flex min-h-8 items-center gap-2 rounded-full border border-border bg-card px-3 text-xs text-muted-foreground">
             <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60" aria-hidden="true" />
-            Price feed not connected · checking…
+            Checking price feed…
           </span>
         ) : now ? (
           <span className={cn("inline-flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold", LEVEL_STYLE[now.level])}>
@@ -55,7 +57,7 @@ export function TodayHeader({ nowMs, today, now }: { nowMs: number | null; today
           <span className="inline-flex min-h-8 items-center rounded-full border border-border bg-card px-3 text-xs text-muted-foreground">Today&apos;s prices unavailable</span>
         )}
         {status && (
-          <span className={cn("rounded-full px-2 py-1 text-[10px] font-bold tracking-wider uppercase", status === "live" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
+          <span className={cn("rounded-md px-2 py-1 text-[11px] font-medium", status === "live" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
             {STATUS_LABEL[status]}
           </span>
         )}
@@ -102,7 +104,7 @@ export function AdviceCard({
 }) {
   if (loading) {
     return (
-      <div className="rounded-[24px] border border-border bg-card p-5" aria-busy="true" aria-label="Loading today's advice">
+      <div className="today-advice" aria-busy="true" aria-label="Loading today's advice">
         <div className="h-4 w-40 animate-pulse rounded bg-muted" />
         <div className="mt-4 h-6 w-3/4 animate-pulse rounded bg-muted" />
         <div className="mt-2 h-4 w-full animate-pulse rounded bg-muted" />
@@ -113,7 +115,7 @@ export function AdviceCard({
 
   if (!suggestion) {
     return (
-      <article className="rounded-[24px] border border-border bg-card p-5 text-center" aria-labelledby="advice-title">
+      <article className="today-advice text-center" aria-labelledby="advice-title">
         <span className="mx-auto grid size-11 place-items-center rounded-full bg-accent text-primary" aria-hidden="true">
           <Check className="size-5" />
         </span>
@@ -164,13 +166,13 @@ export function AdviceCard({
 
   return (
     <article
-      className="relative rounded-[24px] border border-border bg-card p-5 shadow-[0_1px_2px_rgb(16_32_29/0.05),0_18px_40px_-24px_rgb(16_32_29/0.35)]"
+      className="today-advice relative"
       aria-labelledby="advice-title"
     >
       <div className="flex items-center justify-between gap-2">
         <span
           className={cn(
-            "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+            "inline-flex items-center gap-1.5 text-xs font-medium",
             isPrice ? "bg-energy text-energy-ink" : "bg-accent text-accent-foreground",
           )}
         >
@@ -179,7 +181,7 @@ export function AdviceCard({
         </span>
         <InfoTip label={`About: ${title}`}>{info}</InfoTip>
       </div>
-      <h2 id="advice-title" className="mt-2 text-[20px] leading-snug font-semibold tracking-tight">
+      <h2 id="advice-title" className="mt-3 text-[22px] leading-snug font-semibold tracking-tight">
         {title}
       </h2>
       {big && <p className="text-[32px] leading-tight font-semibold tracking-tight tabular-nums">{big}</p>}
@@ -201,9 +203,9 @@ export function AdviceCard({
             {tomorrow ? (
               <p className="mt-3 text-sm text-muted-foreground">Stamp it tomorrow.</p>
             ) : (
-              <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 <Button className="h-12 rounded-full text-[15px] font-semibold" onClick={onDone}>
-                  I did it — add a stamp
+                  I did it, add a stamp
                 </Button>
                 <Button variant="outline" className="h-12 rounded-full px-4" onClick={onWhy}>
                   <Sparkles aria-hidden="true" /> Why?
@@ -244,7 +246,7 @@ export function PriceStripCard({ plan, today, nowMs, onRetry, onUseDemo }: { pla
   const unavailableText = today.data.error ?? "Prices for today aren't published yet.";
   const showUnavailable = !plan && !isUsable(today);
   return (
-    <section aria-labelledby="strip-title" className="rounded-[22px] border border-border bg-card px-4 pt-3.5 pb-3">
+    <section aria-labelledby="strip-title" className="price-surface">
       <div className="flex items-center justify-between gap-3">
         <h2 id="strip-title" className="text-sm font-semibold">
           {plan?.day === "tomorrow" ? "Tomorrow's prices" : "Today's prices"}
@@ -294,8 +296,8 @@ export function PriceStripCard({ plan, today, nowMs, onRetry, onUseDemo }: { pla
 
 export function UpcomingReminders({ rows, onPreview }: { rows: ReminderRow[]; onPreview: () => void }) {
   return (
-    <section aria-labelledby="reminders-title" className="rounded-[22px] border border-border bg-card p-4">
-      <div className="flex items-center justify-between gap-3">
+    <section aria-labelledby="reminders-title" className="reminder-surface">
+      <div className="flex flex-wrap items-center justify-between gap-x-3">
         <h2 id="reminders-title" className="flex items-center text-sm font-semibold">
           Upcoming reminders
           <InfoTip label="About reminders">In-app reminders while WattHabit is open. Accept a challenge to add one. Push notifications are coming later.</InfoTip>

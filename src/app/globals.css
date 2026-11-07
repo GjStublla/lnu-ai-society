@@ -70,33 +70,34 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
 }
 
 :root {
-  /* Warm coffeehouse neutrals with a restrained green action color. */
-  --background: #f7f4ed;
-  --foreground: #29251f;
-  --card: #fffdf8;
-  --card-foreground: #29251f;
-  --popover: #fffdf8;
-  --popover-foreground: #29251f;
-  --primary: #356b50;
-  --primary-foreground: #ffffff;
-  --secondary: #eee9de;
-  --secondary-foreground: #3c382f;
-  --muted: #f0ece3;
-  --muted-foreground: #69645a;
-  --accent: #e6eee5;
-  --accent-foreground: #2e5b43;
+  /* Oat surfaces, green ink and a sage reward scene. */
+  --background: oklch(0.965 0.009 93);
+  --foreground: oklch(0.32 0.029 155);
+  --card: oklch(0.992 0.006 100);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.435 0.06 155);
+  --primary-foreground: oklch(0.985 0.008 100);
+  --secondary: oklch(0.925 0.014 105);
+  --secondary-foreground: oklch(0.4 0.02 140);
+  --muted: oklch(0.935 0.012 100);
+  --muted-foreground: oklch(0.47 0.018 135);
+  --accent: oklch(0.9 0.03 125);
+  --accent-foreground: oklch(0.37 0.05 155);
   --destructive: #c2362b;
-  --border: #e6dfd2;
-  --input: #d4ccbd;
-  --ring: #356b50;
-  --focus: #356b50;
-  --energy: #c9f25a;
-  --energy-strong: #8fd422;
-  --energy-ink: #1d3a06;
+  --border: oklch(0.87 0.015 110);
+  --input: oklch(0.77 0.02 115);
+  --ring: var(--primary);
+  --focus: var(--primary);
+  --energy: oklch(0.93 0.055 120);
+  --energy-strong: oklch(0.59 0.105 145);
+  --energy-ink: oklch(0.34 0.055 145);
   --peak: #f2a93b;
   --peak-soft: #fff1d9;
   --peak-ink: #7a4300;
-  --strip: #c9d5d1;
+  --strip: oklch(0.8 0.024 140);
+  --reward-scene: oklch(0.9 0.028 120);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -111,6 +112,55 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* The mug is the visual anchor; routine information stays on quiet surfaces. */
+.today-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.today-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: stretch; }
+.today-workspace { display: flex; min-width: 0; flex-direction: column; gap: 20px; }
+.reward-focus { position: relative; display: grid; grid-template-columns: 1fr; overflow: hidden; border-radius: 24px; background: var(--reward-scene); padding: 26px; }
+.reward-focus-copy { position: relative; z-index: 1; }
+.reward-focus-mug { width: min(100%, 350px); margin: -20px auto -14px; }
+.mug-object { width: 100%; transform-origin: 50% 70%; }
+.reward-focus-progress { position: relative; z-index: 1; padding-block: 16px 20px; }
+.coach-entry { display: flex; min-height: 64px; width: 100%; align-items: center; gap: 12px; border-radius: 14px; background: var(--primary); color: var(--primary-foreground); padding: 12px 16px; transition: background 180ms ease-out, transform 180ms ease-out; }
+.coach-entry:hover { background: oklch(0.38 0.06 155); }
+.coach-entry:active { transform: scale(0.985); }
+.coach-entry:focus-visible { outline-color: var(--foreground); }
+.today-advice { border-radius: 20px; background: var(--card); padding: 24px; }
+.price-surface { border-top: 1px solid var(--border); padding: 20px 4px 0; }
+.price-surface svg { height: 54px; }
+.reminder-surface { border-top: 1px solid var(--border); padding: 14px 4px 0; }
+.app-section + .app-section { margin-top: 16px; }
+.wallet-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.wallet-layout > * { min-width: 0; }
+.app-navigation { position: fixed; inset-inline: 0; bottom: 0; z-index: 30; border-top: 1px solid var(--border); background: var(--card); padding-bottom: env(safe-area-inset-bottom); }
+
+@media (min-width: 768px) {
+  .today-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 40px; }
+  .reward-focus { padding: 30px; }
+  .reward-focus-mug { margin-block: -26px -14px; }
+  .reward-focus-progress { margin-top: auto; }
+  .wallet-layout { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
+  .wallet-layout > :first-child { grid-row: span 3; }
+  .wallet-layout > :last-child { grid-column: 2; }
+  .app-navigation { inset-inline: max(24px, calc((100% - 580px) / 2)); bottom: 20px; border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; box-shadow: 0 8px 30px oklch(0.3 0.025 145 / 0.09); }
+}
+
+@media (max-width: 767px) {
+  .app-navigation { width: 100vw; top: calc(100dvh - 65px - env(safe-area-inset-bottom)); bottom: auto; }
+  .today-heading { align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  .today-heading > [role="status"] { gap: 6px; }
+  .reward-focus { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); padding: 22px; }
+  .reward-focus-copy h2 { font-size: 24px; }
+  .reward-focus-copy > a { max-width: 145px; font-size: 12px; }
+  .reward-focus-mug { align-self: center; width: 195px; max-width: none; margin: -6px -44px 0 -14px; }
+  .reward-focus-progress, .coach-entry { grid-column: 1 / -1; }
+  .reward-focus-progress > div { flex-wrap: nowrap; gap: 12px; }
+  .reward-focus-progress ol { gap: 5px; }
+  .reward-focus-progress ol span.grid { width: 25px; height: 25px; }
+  .reward-focus-progress p.text-xs { max-width: 23ch; font-size: 10px; line-height: 1.5; }
+  .today-advice { padding: 22px; }
 }
 
 .dark {

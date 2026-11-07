@@ -95,7 +95,7 @@ export function Sheet({
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50" key="sheet-root">
+        <div className="fixed inset-0 z-50 h-dvh w-screen" key="sheet-root">
           <motion.div
             className="absolute inset-0 bg-[rgb(9_27_24/0.42)] backdrop-blur-[2px]"
             initial={{ opacity: 0 }}

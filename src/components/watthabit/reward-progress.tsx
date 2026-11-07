@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { ChevronRight } from "lucide-react";
+import { ArrowUpRight, Check, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InfoTip } from "./info-tip";
 import { Mug } from "./mug";
@@ -16,8 +16,8 @@ export function StampDots({ progress, goal, exampleStamps, size = "sm" }: { prog
           <li key={i} className="list-none">
             <motion.span
               initial={false}
-              animate={{ scale: filled ? [1.35, 1] : 1 }}
-              transition={{ duration: 0.35 }}
+              animate={{ scale: 1, opacity: filled ? 1 : 0.65 }}
+              transition={{ duration: 0.2 }}
               className={cn(
                 "grid place-items-center rounded-full border font-semibold tabular-nums",
                 size === "sm" ? "size-3" : "size-8 text-[11px]",
@@ -25,7 +25,7 @@ export function StampDots({ progress, goal, exampleStamps, size = "sm" }: { prog
               )}
             >
               <span className="sr-only">{filled ? (example ? "Example stamp" : "Earned stamp") : "Empty stamp"}</span>
-              {size === "lg" && <span aria-hidden="true">{i + 1}</span>}
+              {size === "lg" && <span aria-hidden="true">{filled ? <Check className="size-4" /> : i + 1}</span>}
             </motion.span>
           </li>
         );
@@ -84,31 +84,39 @@ type RewardProgressProps = {
   celebrateKey: number;
 };
 
-/** Compact Today widget — a small part of the screen, not the hero. */
-export function RewardWidget({ progress, goal, exampleStamps, dropKey, celebrateKey }: RewardProgressProps) {
+/** First-section reward progress with direct access to the grounded coach. */
+export function RewardFocus({ progress, goal, exampleStamps, dropKey, celebrateKey, onOpenCoach, coachOpen }: RewardProgressProps & { onOpenCoach: () => void; coachOpen: boolean }) {
   const full = progress >= goal;
   return (
-    <section aria-labelledby="reward-widget-title" className="flex items-center gap-4 rounded-[22px] border border-border bg-card p-4 shadow-[0_1px_2px_rgb(16_32_29/0.04)]">
-      <div className="relative w-[72px] shrink-0">
+    <section aria-labelledby="reward-widget-title" className="reward-focus">
+      <div className="reward-focus-copy">
+        <p className="text-sm font-medium text-primary">Your daily ritual</p>
+        <h2 id="reward-widget-title" className="mt-2 whitespace-pre-line text-[28px] leading-[1.15] font-semibold tracking-tight sm:text-[32px]">
+          {full ? "A full cup.\nA little win." : "Good habits,\none cup at a time."}
+        </h2>
+        <a href="#rewards" className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline">
+          Explore demo rewards <ArrowUpRight className="size-4" aria-hidden="true" />
+        </a>
+      </div>
+      <div className="reward-focus-mug relative">
         <Mug progress={progress} goal={goal} />
         <StampDrop dropKey={dropKey} />
         <Celebration celebrateKey={celebrateKey} />
       </div>
-      <div className="min-w-0 flex-1">
-        <h2 id="reward-widget-title" className="text-[15px] font-semibold">
-          {full ? "Reward unlocked" : `${progress}/${goal} to next reward`}
-        </h2>
-        <p className="sr-only" aria-live="polite">
-          {progress} of {goal} stamps.
-        </p>
-        <div className="mt-2">
-          <StampDots progress={progress} goal={goal} exampleStamps={exampleStamps} />
+      <div className="reward-focus-progress">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold" aria-live="polite">{full ? "Demo reward unlocked" : `${progress} of ${goal} stamps collected`}</p>
+            <p className="mt-1 max-w-[30ch] text-xs text-muted-foreground">{exampleStamps} example stamps · demo progress<span className="block">Participation, not measured savings.</span></p>
+          </div>
+          <StampDots progress={progress} goal={goal} exampleStamps={exampleStamps} size="lg" />
         </div>
-        <p className="mt-1 text-[11px] text-muted-foreground">{exampleStamps} example stamps · demo progress</p>
       </div>
-      <a href="#rewards" className="grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Open rewards">
-        <ChevronRight className="size-5" aria-hidden="true" />
-      </a>
+      <button type="button" onClick={onOpenCoach} aria-haspopup="dialog" aria-expanded={coachOpen} className="coach-entry">
+        <MessageCircle className="size-5 shrink-0" aria-hidden="true" />
+        <span className="flex-1 text-left"><span className="block text-sm font-semibold">Ask WattHabit</span><span className="block text-xs opacity-80">Help with prices, bills & habits</span></span>
+        <ArrowUpRight className="size-4" aria-hidden="true" />
+      </button>
     </section>
   );
 }
