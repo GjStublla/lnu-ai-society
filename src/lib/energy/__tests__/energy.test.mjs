@@ -434,6 +434,17 @@ test("oversized declared upstream bodies are rejected", () => {
   assert.equal(isDeclaredPayloadTooLarge(String(600 * 1024)), true);
 });
 
+test("duplicate input slots do not duplicate the best window", () => {
+  const day = buildDay("2026-11-07", (index) => index);
+  const windows = findCheapestWindows([...day, ...day], {
+    durationMinutes: 60,
+    maxResults: 5,
+    now: BEFORE_DAY,
+  });
+  assert.equal(new Set(windows.map((window) => window.startsAt)).size, windows.length);
+  assert.equal(windows[0].startLocal, "00:00");
+});
+
 test("opportunity catalog contains only sourced, verified, dated notices", () => {
   assert.deepEqual(validateOpportunityCatalog(), []);
 

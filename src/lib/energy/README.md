@@ -100,7 +100,7 @@ local start and end (`02:45–02:45`); use the ISO instants to disambiguate.
 
 ## Tests
 
-Offline feature tests (27, no network, Node 24 built-in runner + type stripping):
+Offline feature tests (28, no network, Node 24 built-in runner + type stripping):
 
 ```bash
 node --test "src/lib/energy/__tests__/*.test.mjs"
@@ -111,8 +111,8 @@ and overlap conversion, parser sorting/validation/negative prices/gaps/overlaps/
 oversized payloads, declared-body limits, hourly history (whole-hour windows
 only), unpublished-vs-invalid payloads, URL building, 60/90/120-minute window
 math, availability windows including “until midnight”, empty/unusable interval
-lists, minimum notice, assumed-load estimates, failure copy, and the
-verified-opportunity catalog.
+lists, duplicate-slot deduplication, minimum notice, assumed-load estimates,
+failure copy, and the verified-opportunity catalog.
 
 Project checks:
 

@@ -98,12 +98,18 @@ function parseClock(value: string, option: string): number {
 
 function toSlots(intervals: PriceInterval[]): Slot[] {
   const slots: Slot[] = [];
+  const seen = new Set<string>();
   for (const interval of intervals) {
     const startMs = Date.parse(interval.startsAt);
     const endMs = Date.parse(interval.endsAt);
     const sekPerKwh = interval.sekPerKwh;
     if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) continue;
     if (typeof sekPerKwh !== "number" || !Number.isFinite(sekPerKwh)) continue;
+    // A caller may concatenate pages or merge feeds; exact duplicates must not
+    // turn one cheap window into several identical "alternatives".
+    const key = `${startMs}|${endMs}|${sekPerKwh}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
     slots.push({ startMs, endMs, sekPerKwh });
   }
   slots.sort((a, b) => a.startMs - b.startMs || a.endMs - b.endMs);
