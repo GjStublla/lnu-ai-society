@@ -2,7 +2,7 @@ import "server-only";
 import type { CoachRequest, CoachResponse, Quest } from "../../types/contracts.ts";
 
 export const PRICE_SOURCE = "https://www.elprisetjustnu.se/elpris-api";
-export const TOPICS = ["start", "shift", "tariff", "included", "prices", "laundry", "charging", "rewards", "safety", "scope"] as const;
+export const TOPICS = ["start", "shift", "tariff", "included", "prices", "laundry", "charging", "efficiency", "rewards", "safety", "scope"] as const;
 export type CoachTopic = (typeof TOPICS)[number];
 
 // Reviewed text only: a model selects a topic; its prose never reaches the client.
@@ -14,6 +14,7 @@ export const GUIDANCE: Record<CoachTopic, string> = {
   prices: "I don't have a verified live price window here yet. Check the price source for your region and choose a continuous window that fits the whole task.",
   laundry: "Choose a laundry time that suits your routine. Compare a complete price window when verified prices are available, keeping the same assumed load for both times.",
   charging: "If charging is flexible, choose a time that fits your routine. Compare applicable prices when a verified window is available; I can't calculate personal savings here.",
+  efficiency: "Turning off or putting a computer to sleep can reduce the electricity it uses while idle, though sleep mode may still use some power. Switch off lights when you leave a room, and unplug standby devices only when it is safe and practical.",
   rewards: "Stamps reflect participation, not measured electricity savings. Any voucher in this demo is DEMO — NOT REDEEMABLE; no café benefit is promised.",
   safety: "Only choose activities you can safely reschedule and follow appliance instructions. Keep essential equipment running; focus on flexible laundry or charging.",
   scope: "I can help with electricity habits, tariff basics and demo challenges. I can't verify personal usage, bill savings or partner offers.",
@@ -23,6 +24,7 @@ export function chooseFallbackTopic(input: CoachRequest): CoachTopic {
   const message = input.message.normalize("NFKC").toLowerCase();
   if (/fridge|freezer|medical|essential|unsafe|overnight|unattended/.test(message)) return "safety";
   if (/voucher|coupon|reward|stamp|free coffee|partner/.test(message)) return "rewards";
+  if (/computer|laptop|desktop|standby|sleep mode|sleeping|idle device|turn off|switch off|unplug|light(?:s|ing)?/.test(message)) return "efficiency";
   if (/included|rent/.test(message)) return "included";
   if (/fixed|tariff|contract/.test(message)) return "tariff";
   if (/kwh|kilowatt|reduce|measured|co2|carbon/.test(message)) return "shift";
@@ -33,7 +35,7 @@ export function chooseFallbackTopic(input: CoachRequest): CoachTopic {
 }
 
 function makeQuest(input: CoachRequest, topic: CoachTopic): Quest | null {
-  if (["rewards", "safety", "scope"].includes(topic)) return null;
+  if (["efficiency", "rewards", "safety", "scope"].includes(topic)) return null;
   const activity = input.activities[0];
   const titles: Record<string, string> = {
     laundry: "Plan your next laundry load",

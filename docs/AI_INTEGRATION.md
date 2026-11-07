@@ -1,19 +1,19 @@
 # Gjin's coach handoff
 
-`POST /api/coach` now implements the existing `CoachRequest` / `CoachResponse` contract. No shared success types or teammate-owned files change. It works immediately without Groq or Supabase. The home page is still Bleron's starter until his UI PR connects the route.
+`POST /api/coach` implements the existing `CoachRequest` / `CoachResponse` contract and is connected to Bleron's coach sheet. It works without Groq or Supabase. Response shapes are unchanged.
 
 ## What this slice does
 - Validates a bounded JSON request: 8 KB total, message 1–1200 trimmed characters, region/housing enums, up to three unique laundry/dishwasher/charging activities and Stockholm `HH:mm` availability or null. Missing `priceSummary` normalizes to null; explicit null is accepted.
-- Validates optional summary timestamps and text, then **discards the entire client summary**. Ignes's trusted server integration is not present yet; this route does not claim a cheap time, live price, personal saving or measured consumption.
+- Validates optional summary timestamps and text, then **discards the entire client summary**. A server-only adapter loads today's/tomorrow's normalized prices, checks source, region, date, units, freshness and real-data status, and uses the shared window engine. Only verified live/cached windows can ground numerical price guidance; demo prices cannot.
 - With a private key, calls Groq with the preferred configurable Qwen model. Groq selects a reviewed guidance topic using strict JSON schema. The server builds all visible prose, quest IDs, evidence URLs and impacts from its reviewed catalog. It never publishes free-form provider prose, numbers, links, offers or reward operations.
 - This is **AI-selected reviewed guidance**, not unrestricted generative chat. State that honestly. Region, billing, activity and availability personalize the response; the user question guides topic selection. All modeled impacts are null until a supported calculation and assumptions are added.
 - Returns `source:'groq'` and the successful model ID only after a valid provider selection. Otherwise returns `source:'fallback', model:null` with a visible written-fallback disclaimer. HTTP 200 for either; malformed/invalid/oversized/slow input returns HTTP 400 `{error:string}`. Next handles unsupported methods with 405.
-- Uses a 1.5-second body-read deadline, at most two model attempts of up to 3 seconds inside a 6.5-second provider budget, a 16 KB provider response limit and a 512-token completion cap per attempt. No retries on 401/429; model-specific/unavailable/invalid-output failures may try the configured alternate once. No background retry loop.
+- Uses a 1.5-second body-read deadline, a separate 1.5-second price-context lookup deadline, at most two model attempts of up to 3 seconds inside a 6.5-second provider budget, a 16 KB provider response limit and a 512-token completion cap per attempt. No retries on 401/429; model-specific/unavailable/invalid-output failures may try the configured alternate once. No background retry loop. A timed-out price lookup stops waiting; its shared upstream fetch retains the energy service's six-second timeout.
 - Propagates client cancellation through body reads and provider calls. An already-aborted request makes no provider call; a disconnect during the primary attempt prevents the alternate attempt.
 - Sets `Cache-Control: no-store`; logs no user messages, provider bodies or keys. Never calls a provider at import/build time. The route has no completion/reward/DB side effects.
 
 ## Bleron's typed fetch
-Use the existing shared types; no duplicate interface or client-side key. Render the returned `reply`, optional quest and `disclaimer`, and clearly label `source:'fallback'` as written guidance. A Groq result means AI selected reviewed guidance, not live price verification. A 400 error is a form error, not a success response.
+Use the existing shared types; no duplicate interface or client-side key. Render the returned `reply`, optional quest and `disclaimer`, and clearly label `source:'fallback'` as written guidance. A Groq result means AI selected reviewed guidance. Any attached numerical price window is independently calculated and verified by the server, with its source/status/update time disclosed. A 400 error is a form error, not a success response.
 
 ```ts
 import type { CoachRequest, CoachResponse, ApiErrorResponse } from '@/types/contracts';
@@ -39,13 +39,13 @@ const guidance = await response.json() as CoachResponse;
 // Render reply, disclaimer and optional quest; also catch network errors in the UI.
 ```
 
-Use an AbortController around the UI call (allow roughly 10 seconds for the complete route) and handle rejection in the UI rather than leaving a spinner. Until a trusted server price adapter is agreed, always pass `priceSummary:null`; inventing a plausible client price summary cannot ground the coach.
+The UI uses a 12-second request timeout and handles network failure without leaving a spinner. Always pass `priceSummary:null`; client summaries cannot ground the coach.
 
 ## Alex's quest integration
 This coach returns stable **participation-planning** IDs: `plan-laundry`, `plan-dishwasher`, `plan-charging`, or educational `learn-spot-prices`. Alex must explicitly approve/allowlist supported IDs before wiring completion; the coach cannot mint points or vouchers. Rewards/safety/out-of-scope topics can return `quest:null`. Evidence links point to public price documentation, not a merchant. `estimatedImpact` is always null.
 
-## Ignes's next integration
-After the energy PR is reviewed, agree a server-only adapter that consumes Ignes's canonical normalized data/window engine. Validate source/status/region/date, continuity, freshness, duration and user availability. Include only verified live/cached facts, identify their status and derive numerical cost estimates outside the model with explicit assumptions. Continue to reject client summaries as evidence. Do not add an internal HTTP self-fetch using the request Host header or modify Ignes's files silently.
+## Price integration
+`price-context.ts` calls Ignes's loader directly, with no internal HTTP request or request-Host trust. `context.ts` derives a complete 60-minute charging or 120-minute laundry/dishwasher window after now and the user's Stockholm availability. It compares the window average with the earliest eligible start on that same day. Today is preferred when the difference is at least 0.05 SEK/kWh, otherwise a useful tomorrow window is considered. All numerical facts and evidence URLs are server-owned. Missing/stale/demo prices produce guidance without price claims. No measured consumption or numeric impact is asserted.
 
 ## Gjin's private setup
 1. If `.env.local` does not exist, copy `.env.example` to `.env.local`. It is ignored; never put a key in a `NEXT_PUBLIC_*` variable or chat.

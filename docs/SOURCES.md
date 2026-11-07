@@ -31,5 +31,11 @@ Elprisetjustnu prices are market spot prices excluding taxes, supplier markups, 
 
 For a savings estimate, record the assumed device kW, operating duration, original and alternate spot price, and contract caveat. Shifting usage yields a modeled SEK difference, NOT kWh reduction. An avoided kWh requires an assumed reduction in consumption; CO2e requires a valid intensity source. Avoid fabricating local offers, subsidy eligibility, or verified partnerships; every verified card needs its own source URL and publication/expiry dates.
 
+## Integrated Radar catalog (rechecked 2026-11-07)
+- Elpriskollen **Styr din elanvändning**, created 2026-03-23: https://elpriskollen.se/sidor/styr-din-elanvandning.html. Public guidance; its household savings example is explicitly a RISE simulation, not a guaranteed student saving.
+- Elpriskollen **Sänk dina kostnader med kvartsprisavtal**, created 2025-09-16: https://elpriskollen.se/sidor/sank-dina-kostnader-med-kvartsprisavtal.html. Public quarter-hour tariff guidance, not a WattHabit offer.
+
+Both source pages expose their creation dates. An earlier entry with only a last-updated date was removed rather than treating that as publication evidence. The catalog has no invented promotions or partner eligibility. An unavailable feed shows an empty/error state; no fictional café fills the gap.
+
 ## Preserved synthetic analyses
 `data_raw/energy_hackathon_participants/README.md` explicitly describes fictional Swedish student flats and synthetic hourly prices/carbon factors. `data_cleaned/`, `charts/` and existing Python scripts are derivative analysis assets, not verified observations, and were not recalculated or audited during bootstrap. Any slide using them must say **synthetic modeled scenario**, state assumptions, and keep live quarter-hour API data separate.

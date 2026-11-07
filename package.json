@@ -12,8 +12,10 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "npm run test:coach && npm run test:smoke",
+    "test": "npm run test:coach && npm run test:energy && npm run test:smoke && npm run test:backend",
     "test:coach": "node --conditions=react-server --experimental-strip-types --test src/lib/ai/*.test.ts",
+    "test:energy": "node --test src/lib/energy/__tests__/energy.test.mjs",
+    "test:backend": "node supabase/test-demo.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "check:groq": "node --conditions=react-server --experimental-strip-types scripts/check-groq-models.mjs"
   },

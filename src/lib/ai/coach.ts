@@ -3,6 +3,7 @@ import type { CoachRequest, CoachResponse } from "../../types/contracts.ts";
 import { buildCoachResponse, chooseFallbackTopic, GUIDANCE } from "./catalog.ts";
 import { completionSchema, selectionJsonSchema, selectionSchema } from "./schema.ts";
 import { readBoundedJson, withDeadline } from "./transport.ts";
+import { type VerifiedPriceContext, verifiedWindowExplanation } from "./context.ts";
 
 export const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 export const DEFAULT_MODEL = "qwen/qwen3.8-27b";
@@ -15,6 +16,7 @@ export type CoachDependencies = {
   env?: Readonly<Record<string, string | undefined>>;
   fetchImpl?: typeof fetch;
   signal?: AbortSignal;
+  priceContext?: VerifiedPriceContext | null;
 };
 
 class StopProviderAttempts extends Error {}
@@ -29,7 +31,23 @@ export function configuredModels(env: Readonly<Record<string, string | undefined
 }
 
 export async function getCoachResponse(input: CoachRequest, dependencies: CoachDependencies = {}): Promise<CoachResponse> {
-  const fallback = () => buildCoachResponse(input, chooseFallbackTopic(input));
+  const respond = (topic: Parameters<typeof buildCoachResponse>[1], model: string | null = null) => {
+    const result = buildCoachResponse(input, topic, model);
+    const context = dependencies.priceContext;
+    if (context) {
+      result.disclaimer = `${model ? "Groq selected reviewed guidance." : "AI unavailable — written fallback guidance."} Verified server price data (${context.status}), fetched ${context.updatedAt}. Spot prices exclude VAT, taxes, grid charges and retailer margins.`;
+    }
+    if (context && !["efficiency", "included", "tariff", "safety", "scope", "rewards"].includes(topic)) {
+      const billing = input.housing === "included" ? " With electricity included in rent, your own bill may not change." : " Financial benefit depends on your electricity tariff.";
+      result.reply = verifiedWindowExplanation(context) + billing;
+      if (result.quest) {
+        result.quest.description = `Plan your activity for ${context.startsAt}–${context.endsAt} (display in Europe/Stockholm). This records participation, not proof that an appliance ran or saved energy.`;
+        result.quest.evidenceSource = context.sourceUrl;
+      }
+    }
+    return result;
+  };
+  const fallback = () => respond(chooseFallbackTopic(input));
   const env = dependencies.env ?? process.env;
   const parentSignal = dependencies.signal;
   const key = env.GROQ_API_KEY?.trim();
@@ -63,6 +81,7 @@ export async function getCoachResponse(input: CoachRequest, dependencies: CoachD
                   activities: input.activities,
                   availableAfter: input.availableAfter,
                   question: input.message,
+                  verifiedServerWindow: dependencies.priceContext ?? null,
                 }),
               },
             ],
@@ -85,7 +104,7 @@ export async function getCoachResponse(input: CoachRequest, dependencies: CoachD
         if (completion.model !== model) throw new Error("Unexpected provider model.");
         return selectionSchema.parse(JSON.parse(completion.choices[0].message.content) as unknown);
       }, parentSignal);
-      return buildCoachResponse(input, selection.topic, model);
+      return respond(selection.topic, model);
     } catch (error) {
       // Provider bodies, prompts and keys are deliberately never returned or logged.
       if (parentSignal?.aborted || error instanceof StopProviderAttempts) break;
