@@ -1,6 +1,15 @@
 import type { Opportunity } from "@/types/contracts";
 
 /**
+ * When this curated catalog was last checked against its sources. `updatedAt`
+ * must describe the feed's real freshness, not the request time, so this
+ * constant is returned by /api/opportunities. Bump it whenever entries change.
+ * The catalog was reviewed on 2026-11-07; midnight is used because the review
+ * evidence is a calendar date.
+ */
+export const OPPORTUNITIES_UPDATED_AT = "2026-11-07T00:00:00+01:00";
+
+/**
  * Curated, verified public notices for the Savings Radar.
  *
  * Rules for this file:

@@ -13,16 +13,19 @@ not modified.
 
 - `region` defaults to `SE4`; invalid values return HTTP 400.
 - `date` defaults to **today in Europe/Stockholm** (not UTC). Impossible dates
-  (`2026-02-30`), dates before the source history floor (`2022-11-01`) and dates
-  later than tomorrow are rejected with HTTP 400 — no upstream probing.
+  (`2026-02-30`) and dates before the source history floor (`2022-11-01`) are
+  rejected with HTTP 400. Any real date after that is accepted; a date the
+  source has not published yet returns HTTP 200 `status:"unavailable"` rather
+  than a misleading 400.
 - Success is always HTTP 200 with `PricesResponse`:
   - `status:"live"` — fetched during this request.
   - `status:"cached"` — served from the per-process cache; `updatedAt` keeps the
     original fetch time.
   - `status:"unavailable"` — bounded `error` text, empty `intervals`; never a 500.
   - `status:"demo"` — only with an explicit `demo=1`; synthetic, never automatic.
-- `intervals` are sorted, deduplicated and contiguous; a DST day can contain 92
-  or 100 quarter-hour intervals. Negative prices are valid.
+- `intervals` are sorted and deduplicated; gaps are never bridged and a window
+  only joins slots whose instants touch exactly. A DST day can contain 92 or 100
+  quarter-hour intervals. Negative prices are valid.
 - The parser accepts 15/30/60-minute slots so historical hourly days
   (before October 2025) still work.
 - `sourceUrl` is the exact upstream JSON URL, e.g.
@@ -32,14 +35,18 @@ not modified.
   (`dynamic = "force-dynamic"`; both routes build as ƒ).
 
 `demo=1` is an additive, opt-in flag for offline demos. It is not part of
-`docs/CONTRACT.md`; Gjin should either accept it or ask for its removal.
+`docs/CONTRACT.md`; Gjin should either accept it or ask for its removal. Demo
+responses point `sourceUrl` at this repository, not at the price provider,
+because the intervals are generated locally.
 
 ### `GET /api/opportunities?region=SE4`
 
 Returns only sourced, verified public notices (`verified:true, demo:false`).
 Each entry has a live HTTPS source and an evidenced date. Expired entries are
 filtered out; an empty list is a valid result. There are no invented partner
-deals, vouchers or exclusive discounts.
+deals, vouchers or exclusive discounts. `updatedAt` is the catalog curation
+date (`OPPORTUNITIES_UPDATED_AT`), not the request time, because the feed is
+curated in-repo and is not refetched per call.
 
 Current entries (checked 2026-11-07):
 
@@ -51,6 +58,8 @@ Current entries (checked 2026-11-07):
 
 The Energimyndigheten page exposes only “Senast uppdaterad 2026-03-23”, so
 `publishedAt` carries that evidenced update date and the description says so.
+The Elpriskollen dates come from the pages' machine-readable `Skapad` timestamps.
+Where a source exposes only a date, midnight Stockholm is used as the instant.
 
 ## Using the window utility (client or server)
 
@@ -80,7 +89,9 @@ time-weighted `averageSekPerKwh`, the interval count and an optional
 
 `availableUntil: "00:00"` means the end of the day, so an evening window that
 finishes at midnight can still be selected. Availability is otherwise same-day:
-overnight ranges such as 22:00–02:00 are not supported.
+overnight ranges such as 22:00–02:00 are not supported. Pass intervals for one
+Stockholm day — availability values are wall-clock minutes and are not
+date-scoped, so mixing days would compare times across dates.
 
 Adjacency is computed on instants, so gaps are never bridged and DST days are
 handled by elapsed time. On the autumn DST night a window can show the same
@@ -100,7 +111,7 @@ local start and end (`02:45–02:45`); use the ISO instants to disambiguate.
 
 ## Tests
 
-Offline feature tests (28, no network, Node 24 built-in runner + type stripping):
+Offline feature tests (29, no network, Node 24 built-in runner + type stripping):
 
 ```bash
 node --test "src/lib/energy/__tests__/*.test.mjs"
@@ -112,7 +123,11 @@ oversized payloads, declared-body limits, hourly history (whole-hour windows
 only), unpublished-vs-invalid payloads, URL building, 60/90/120-minute window
 math, availability windows including “until midnight”, empty/unusable interval
 lists, duplicate-slot deduplication, minimum notice, assumed-load estimates,
-failure copy, and the verified-opportunity catalog.
+failure copy, opportunity-feed freshness, and the verified-opportunity catalog.
+
+The offline suite covers the pure modules. The service/route layer performs
+network I/O and is covered by the production-server integration checks below,
+not by `node --test`.
 
 Project checks:
 
@@ -125,8 +140,9 @@ npm run typecheck && npm run lint && npm run build && npm test
 Integration checks were run against `next start` on 2026-11-07: live SE4 (96
 intervals), cached second request, tomorrow live, 2026-03-29 → 92 intervals,
 2026-10-25 → 100 intervals, 2025-06-01 → 24 hourly intervals, `demo=1`,
-all 400/405 cases, and the failure path (DNS redirected to a closed port →
-`status:"unavailable"` with bounded text, HTTP 200).
+all 400/405 cases, a far-future date → 200 `unavailable`, and the failure path
+(DNS redirected to a closed port → `status:"unavailable"` with bounded text,
+HTTP 200).
 
 ## Known limitations
 

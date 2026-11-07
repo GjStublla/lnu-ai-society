@@ -1,4 +1,4 @@
-import { getCurrentOpportunities } from "@/lib/energy/opportunities";
+import { OPPORTUNITIES_UPDATED_AT, getCurrentOpportunities } from "@/lib/energy/opportunities";
 import { DEFAULT_REGION, REGION_ERROR_MESSAGE, parseRegion } from "@/lib/energy/regions";
 import type { OpportunitiesResponse } from "@/types/contracts";
 
@@ -36,7 +36,9 @@ export async function GET(request: Request): Promise<Response> {
 
   const response: OpportunitiesResponse = {
     opportunities: getCurrentOpportunities(new Date()),
-    updatedAt: new Date().toISOString(),
+    // The feed is curated in-repo; request time would falsely imply it was
+    // refreshed on every call.
+    updatedAt: OPPORTUNITIES_UPDATED_AT,
   };
   return json(response);
 }

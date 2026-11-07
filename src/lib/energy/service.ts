@@ -153,8 +153,11 @@ async function fetchPrices(input: {
   let payload: unknown;
   try {
     payload = await response.json();
-  } catch {
-    return fail("invalid_payload");
+  } catch (error) {
+    // The deadline can fire after headers arrive but while the body is read.
+    const timedOut =
+      error instanceof DOMException && (error.name === "TimeoutError" || error.name === "AbortError");
+    return fail(timedOut ? "timeout" : "invalid_payload");
   }
 
   const bounds = stockholmDayBounds(input.date);

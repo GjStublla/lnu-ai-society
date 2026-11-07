@@ -20,6 +20,7 @@ import {
 } from "../prices.ts";
 import { findCheapestWindow, findCheapestWindows } from "../windows.ts";
 import {
+  OPPORTUNITIES_UPDATED_AT,
   VERIFIED_OPPORTUNITIES,
   getCurrentOpportunities,
   validateOpportunityCatalog,
@@ -339,12 +340,17 @@ test("spring-forward day has 92 slots and windows keep 60 elapsed minutes", () =
   assert.ok(windows.length > 0);
   for (const window of windows) {
     assert.equal(Date.parse(window.endsAt) - Date.parse(window.startsAt), 60 * 60 * 1000);
-    assert.notEqual(window.startLocal, "02:30");
   }
 
   const oneOClock = windows.find((window) => window.startLocal === "01:00");
   assert.ok(oneOClock);
   assert.equal(oneOClock.endLocal, "03:00");
+
+  // The nonexistent 02:00–02:59 hour means a window starting at 01:45 has to
+  // surface as 03:45 locally while still lasting exactly 60 elapsed minutes.
+  const oneFortyFive = windows.find((window) => window.startLocal === "01:45");
+  assert.ok(oneFortyFive);
+  assert.equal(oneFortyFive.endLocal, "03:45");
 });
 
 test("fall-back day has 100 slots and the repeated hour stays unambiguous", () => {
@@ -443,6 +449,14 @@ test("duplicate input slots do not duplicate the best window", () => {
   });
   assert.equal(new Set(windows.map((window) => window.startsAt)).size, windows.length);
   assert.equal(windows[0].startLocal, "00:00");
+});
+
+test("opportunity feed freshness is a fixed catalog date, not request time", () => {
+  const updatedAt = Date.parse(OPPORTUNITIES_UPDATED_AT);
+  assert.ok(Number.isFinite(updatedAt));
+  assert.ok(updatedAt >= Date.parse(VERIFIED_OPPORTUNITIES[0].publishedAt));
+  // It must stay a curation date, not drift with the clock on every request.
+  assert.ok(updatedAt <= Date.parse("2026-11-08T00:00:00Z"));
 });
 
 test("opportunity catalog contains only sourced, verified, dated notices", () => {
