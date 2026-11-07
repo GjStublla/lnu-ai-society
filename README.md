@@ -2,6 +2,8 @@
 
 **WattHabit — Small habits. Real rewards.** A student energy-habit and rewards app. Coffee cup fill is one progress treatment; rewards can extend to student discounts and events.
 
+Public demo: https://watthabit.vercel.app
+
 The integrated demo uses Next.js App Router, TypeScript, Tailwind, shadcn/ui, Lucide and Motion. Onboarding, region-specific prices, a continuous price-window quest, AI-selected reviewed guidance, animated cup progress, demo wallet and sourced Radar are connected. It works without keys, login or Supabase using explicit fallbacks. [AI integration](docs/AI_INTEGRATION.md) describes the server-grounded coach; [demo checklist](docs/DEMO_CHECKLIST.md) records tested workflows and the presentation path.
 
 - Project: `PROJECT.md`
@@ -29,7 +31,7 @@ npm test
 ```
 `npm test` runs 26 coach tests, 33 energy tests, an offline production smoke check and the cookie-based reward flow (validation, repeat completion, unlock, repeat redemption and browser isolation). Build first. CI runs the same checks on main and PRs. Tests use no paid model calls. `npm start` serves a built app. Recommended Node 24; native feature tests require Node >=22.18.
 
-Deployment acceptance: `node scripts/demo-workflows.mjs --url https://lnu-ai-society.vercel.app`. Add `--live-coach` for one real coach request, which may use Groq quota; missing quota/key still yields labeled fallback. This script verifies HTTP workflows, not visual interactions.
+Deployment acceptance: `node scripts/demo-workflows.mjs --url https://watthabit.vercel.app`. Add `--live-coach` for one real coach request, which may use Groq quota; missing quota/key still yields labeled fallback. This script verifies HTTP workflows, not visual interactions.
 
 ## Team start
 Accept Gjin's GitHub invitation, clone, run `npm ci`, then switch to your assigned prepared branch. Bleron's `feature/frontend`, Alex's `feature/backend` and Ignes's `feature/energy` are prepared from the bootstrap on Gjin's request. Gjin creates his own `feature/ai-integration` when starting AI work. Exact commands and prompt paths: [docs/TEAM.md](docs/TEAM.md). Gjin coordinates dependency/lockfile, layout and contract changes.

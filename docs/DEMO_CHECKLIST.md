@@ -6,7 +6,7 @@
 - [x] 33 energy tests: negative prices, continuity, modeled costs, 92/100-slot DST days, availability, impossible dates, actual streamed byte cap and sourced catalog.
 - [x] Offline production smoke: page/navigation/assets, key-free coach fallback, invalid requests, unavailable prices, explicit demo prices and sourced Radar.
 - [x] Cookie reward API: 3→4→5, repeated completion unchanged, locked/invalid redemption rejected, repeat redemption idempotent, browser isolation.
-- [ ] Final production HTTP acceptance after integration deploy: command below.
+- [x] Production HTTP acceptance passed on https://watthabit.vercel.app (2026-11-07): page, live prices, Radar, validation and isolated reward flow. Rerun the command below after future deployments.
 - [ ] Real browser onboarding, click-through, refresh persistence, mobile overflow, keyboard focus and reduced-motion check. Browser automation stopped because it could not verify the current URL; source/HTTP checks do not replace this gate.
 - [ ] Supabase live migrations/auth/RLS. Not required for this no-login demo; do not claim them as tested.
 
@@ -22,8 +22,8 @@
 ## Production API acceptance
 After Vercel reports the integrated commit ready:
 
-    node scripts/demo-workflows.mjs --url https://lnu-ai-society.vercel.app
-    node scripts/demo-workflows.mjs --url https://lnu-ai-society.vercel.app --live-coach
+    node scripts/demo-workflows.mjs --url https://watthabit.vercel.app
+    node scripts/demo-workflows.mjs --url https://watthabit.vercel.app --live-coach
 
 The second command makes one coach request that may consume Groq quota. It accepts a transparent fallback as a functioning route and prints which source was returned; inspect that result before claiming live AI. The script checks the production page, current Stockholm-date prices, explicit demo fixture, invalid inputs, sourced Radar and isolated-cookie reward unlock/redeem. It does not click the frontend or prove Supabase persistence.
 
