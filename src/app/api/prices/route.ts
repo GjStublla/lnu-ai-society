@@ -19,6 +19,17 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
+function methodNotAllowed(): Response {
+  return json({ error: "Method not allowed. Use GET." }, 405);
+}
+
+// Next would answer 405 with an empty body; the contract asks every route
+// response to be JSON, so the unsupported methods are explicit.
+export const POST = methodNotAllowed;
+export const PUT = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+
 const DEMO_FLAG_VALUES = new Set(["1"]);
 
 /**

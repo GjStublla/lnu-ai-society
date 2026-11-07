@@ -13,6 +13,7 @@ import {
 } from "../time.ts";
 import {
   classifyEmptyPayload,
+  isDeclaredPayloadTooLarge,
   parseUpstreamPrices,
   priceFailureMessage,
   priceSourceUrl,
@@ -376,6 +377,61 @@ test("parser accepts a complete DST fall-back day", () => {
   assert.equal(parsed.gaps, 0);
   assert.equal(parsed.overlaps, 0);
   assert.equal(parsed.intervals[0].startsAt, "2026-10-24T22:00:00.000Z");
+});
+
+test("availableUntil 00:00 includes the final window of the day", () => {
+  const day = buildDay("2026-11-07", (index) => (index >= 92 ? 0.1 : 5));
+  const window = findCheapestWindow(day, {
+    now: BEFORE_DAY,
+    availableAfter: "18:00",
+    availableUntil: "00:00",
+  });
+  assert.ok(window);
+  assert.equal(window.startLocal, "23:00");
+  assert.equal(window.endLocal, "00:00");
+  assert.equal(window.averageSekPerKwh, 0.1);
+});
+
+test("hourly history supports whole-hour windows only", () => {
+  const bounds = stockholmDayBounds("2025-06-01");
+  const startMs = bounds.start.getTime();
+  const hourly = Array.from({ length: 24 }, (_, hour) => ({
+    startsAt: new Date(startMs + hour * 60 * 60 * 1000).toISOString(),
+    endsAt: new Date(startMs + (hour + 1) * 60 * 60 * 1000).toISOString(),
+    sekPerKwh: hour,
+  }));
+  const now = new Date("2025-01-01T00:00:00Z");
+
+  const oneHour = findCheapestWindow(hourly, { durationMinutes: 60, now });
+  assert.equal(oneHour.intervalCount, 1);
+  assert.equal(oneHour.averageSekPerKwh, 0);
+
+  const ninety = findCheapestWindows(hourly, { durationMinutes: 90, now });
+  assert.deepEqual(ninety, []);
+
+  const twoHours = findCheapestWindow(hourly, { durationMinutes: 120, now });
+  assert.equal(twoHours.intervalCount, 2);
+  assert.equal(twoHours.averageSekPerKwh, 0.5);
+});
+
+test("empty or unusable interval lists return no windows", () => {
+  assert.deepEqual(findCheapestWindows([], { now: BEFORE_DAY }), []);
+  assert.equal(findCheapestWindow([], { now: BEFORE_DAY }), null);
+
+  const invalid = [
+    { startsAt: "not-a-date", endsAt: "2026-11-07T00:15:00.000Z", sekPerKwh: 1 },
+    { startsAt: "2026-11-07T00:15:00.000Z", endsAt: "2026-11-07T00:00:00.000Z", sekPerKwh: 1 },
+    { startsAt: "2026-11-07T00:00:00.000Z", endsAt: "2026-11-07T00:15:00.000Z", sekPerKwh: Number.NaN },
+  ];
+  assert.deepEqual(findCheapestWindows(invalid, { now: BEFORE_DAY }), []);
+});
+
+test("oversized declared upstream bodies are rejected", () => {
+  assert.equal(isDeclaredPayloadTooLarge("2048"), false);
+  assert.equal(isDeclaredPayloadTooLarge(null), false);
+  assert.equal(isDeclaredPayloadTooLarge(""), false);
+  assert.equal(isDeclaredPayloadTooLarge("not-a-number"), false);
+  assert.equal(isDeclaredPayloadTooLarge(String(600 * 1024)), true);
 });
 
 test("opportunity catalog contains only sourced, verified, dated notices", () => {

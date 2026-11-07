@@ -31,6 +31,16 @@ export const MAX_UPSTREAM_INTERVALS = 200;
 /** Sanity bound for outlier/spike protection, not a market prediction. */
 export const MAX_ABS_PRICE_SEK_PER_KWH = 1_000;
 
+/** A 96-slot day is ~15 KB; 512 KB leaves room for a format change. */
+export const MAX_UPSTREAM_BYTES = 512 * 1024;
+
+/** Reject a declared oversized upstream body before parsing it as JSON. */
+export function isDeclaredPayloadTooLarge(contentLength: string | null): boolean {
+  if (contentLength === null || contentLength.trim() === "") return false;
+  const declaredBytes = Number(contentLength);
+  return Number.isFinite(declaredBytes) && declaredBytes > MAX_UPSTREAM_BYTES;
+}
+
 const ACCEPTED_SLOT_MINUTES = new Set([15, 30, 60]);
 const ISO_INSTANT_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 const MAX_REPORTED_ISSUES = 8;

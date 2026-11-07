@@ -1,6 +1,7 @@
 import type { PriceInterval, PricesResponse, Region } from "@/types/contracts";
 import {
   classifyEmptyPayload,
+  isDeclaredPayloadTooLarge,
   parseUpstreamPrices,
   priceFailureMessage,
   priceSourceUrl,
@@ -144,6 +145,10 @@ async function fetchPrices(input: {
   }
 
   if (!response.ok) return fail(response.status === 404 ? "not_published" : "http_error");
+
+  if (isDeclaredPayloadTooLarge(response.headers.get("content-length"))) {
+    return fail("invalid_payload");
+  }
 
   let payload: unknown;
   try {

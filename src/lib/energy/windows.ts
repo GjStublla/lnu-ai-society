@@ -23,7 +23,8 @@ export type WindowSearchOptions = {
   durationMinutes?: WindowDurationMinutes;
   /** Earliest local start time, `HH:mm` in Europe/Stockholm. */
   availableAfter?: string | null;
-  /** Latest local end time, `HH:mm` in Europe/Stockholm. */
+  /** Latest local end time, `HH:mm` in Europe/Stockholm. `00:00` means the end
+   * of the day, so an evening window that finishes at midnight is allowed. */
   availableUntil?: string | null;
   /** Minutes of notice before a window may start (default 0). */
   minNoticeMinutes?: number;
@@ -155,8 +156,11 @@ export function findCheapestWindows(
 
   const afterMinutes =
     options.availableAfter != null ? parseClock(options.availableAfter, "availableAfter") : null;
-  const untilMinutes =
+  const rawUntilMinutes =
     options.availableUntil != null ? parseClock(options.availableUntil, "availableUntil") : null;
+  // "00:00" as a latest end time means midnight at the end of the day, not the
+  // start of it. This lets callers express "evening, until I go to bed at 24:00".
+  const untilMinutes = rawUntilMinutes === 0 ? 24 * 60 : rawUntilMinutes;
 
   const earliestStartMs = nowMs + minNoticeMinutes * 60_000;
   const source = options.source ?? null;

@@ -13,6 +13,15 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
+function methodNotAllowed(): Response {
+  return json({ error: "Method not allowed. Use GET." }, 405);
+}
+
+export const POST = methodNotAllowed;
+export const PUT = methodNotAllowed;
+export const PATCH = methodNotAllowed;
+export const DELETE = methodNotAllowed;
+
 /**
  * GET /api/opportunities?region=SE4
  *

@@ -27,8 +27,9 @@ not modified.
   (before October 2025) still work.
 - `sourceUrl` is the exact upstream JSON URL, e.g.
   `https://www.elprisetjustnu.se/api/v1/prices/2026/11-07_SE4.json`.
-- Upstream requests have a 6-second deadline (`AbortSignal.timeout`) and are
-  never made at build time (`dynamic = "force-dynamic"`; both routes build as ƒ).
+- Upstream requests have a 6-second deadline (`AbortSignal.timeout`), a 512 KB
+  declared-body cap and a 200-record cap, and are never made at build time
+  (`dynamic = "force-dynamic"`; both routes build as ƒ).
 
 `demo=1` is an additive, opt-in flag for offline demos. It is not part of
 `docs/CONTRACT.md`; Gjin should either accept it or ask for its removal.
@@ -77,6 +78,10 @@ const window = findCheapestWindow(prices.intervals, {
 time-weighted `averageSekPerKwh`, the interval count and an optional
 `estimatedSek = averageSekPerKwh × assumedKwh`.
 
+`availableUntil: "00:00"` means the end of the day, so an evening window that
+finishes at midnight can still be selected. Availability is otherwise same-day:
+overnight ranges such as 22:00–02:00 are not supported.
+
 Adjacency is computed on instants, so gaps are never bridged and DST days are
 handled by elapsed time. On the autumn DST night a window can show the same
 local start and end (`02:45–02:45`); use the ISO instants to disambiguate.
@@ -95,7 +100,7 @@ local start and end (`02:45–02:45`); use the ISO instants to disambiguate.
 
 ## Tests
 
-Offline feature tests (23, no network, Node 24 built-in runner + type stripping):
+Offline feature tests (27, no network, Node 24 built-in runner + type stripping):
 
 ```bash
 node --test "src/lib/energy/__tests__/*.test.mjs"
@@ -103,9 +108,11 @@ node --test "src/lib/energy/__tests__/*.test.mjs"
 
 Covered: impossible/leap dates, Stockholm day bounds, 23/25-hour days, DST gap
 and overlap conversion, parser sorting/validation/negative prices/gaps/overlaps/
-oversized payloads, hourly history, unpublished-vs-invalid payloads, URL
-building, 60/90/120-minute window math, availability windows, minimum notice,
-assumed-load estimates, failure copy, and the verified-opportunity catalog.
+oversized payloads, declared-body limits, hourly history (whole-hour windows
+only), unpublished-vs-invalid payloads, URL building, 60/90/120-minute window
+math, availability windows including “until midnight”, empty/unusable interval
+lists, minimum notice, assumed-load estimates, failure copy, and the
+verified-opportunity catalog.
 
 Project checks:
 
@@ -131,5 +138,7 @@ all 400/405 cases, and the failure path (DNS redirected to a closed port →
   `error`.
 - `/api/opportunities` is national; `region` is validated but does not filter
   the list yet.
+- User availability is same-day only; a window cannot cross Stockholm midnight
+  (a window ending exactly at midnight is supported via `availableUntil:"00:00"`).
 - Records that fail validation are dropped and gaps/overlaps are logged
   server-side; they are never filled with invented slots.
