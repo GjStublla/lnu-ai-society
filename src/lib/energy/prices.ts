@@ -179,6 +179,16 @@ export function parseUpstreamPrices(payload: unknown, bounds?: PriceDayBounds): 
 }
 
 /**
+ * Distinguish an empty published day from unusable data. The source returns
+ * `[]` when a day is not published yet (typically tomorrow before ~13:00
+ * Europe/Stockholm); malformed payloads must not be labelled as "not
+ * published" because that would hide a real integration failure.
+ */
+export function classifyEmptyPayload(payload: unknown): PriceFailureReason {
+  return Array.isArray(payload) && payload.length === 0 ? "not_published" : "invalid_payload";
+}
+
+/**
  * Bounded, user-facing explanation for a failed price request. Provider error
  * bodies and internal exception text are never forwarded.
  */

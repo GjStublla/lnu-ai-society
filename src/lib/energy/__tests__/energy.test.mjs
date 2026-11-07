@@ -11,7 +11,12 @@ import {
   stockholmDayBounds,
   zonedTimeToInstant,
 } from "../time.ts";
-import { parseUpstreamPrices, priceFailureMessage, priceSourceUrl } from "../prices.ts";
+import {
+  classifyEmptyPayload,
+  parseUpstreamPrices,
+  priceFailureMessage,
+  priceSourceUrl,
+} from "../prices.ts";
 import { findCheapestWindow, findCheapestWindows } from "../windows.ts";
 import {
   VERIFIED_OPPORTUNITIES,
@@ -192,6 +197,15 @@ test("failure copy is bounded and explains unpublished tomorrow data", () => {
   const past = priceFailureMessage("not_published", { isTomorrow: false });
   assert.doesNotMatch(past, /13:00/);
   assert.match(priceFailureMessage("timeout", { isTomorrow: false }), /did not respond/);
+});
+
+test("empty payload means unpublished, malformed payload means invalid", () => {
+  // The source returns [] for a day that is not published yet (tomorrow before
+  // ~13:00). Malformed data must not be mislabelled as "not published".
+  assert.equal(classifyEmptyPayload([]), "not_published");
+  assert.equal(classifyEmptyPayload([{ time_start: "bad" }]), "invalid_payload");
+  assert.equal(classifyEmptyPayload({ error: "nope" }), "invalid_payload");
+  assert.equal(classifyEmptyPayload(null), "invalid_payload");
 });
 
 test("source URL always keeps year, month and day", () => {

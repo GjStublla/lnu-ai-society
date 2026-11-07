@@ -1,5 +1,6 @@
 import type { PriceInterval, PricesResponse, Region } from "@/types/contracts";
 import {
+  classifyEmptyPayload,
   parseUpstreamPrices,
   priceFailureMessage,
   priceSourceUrl,
@@ -160,7 +161,7 @@ async function fetchPrices(input: {
   });
 
   if (parsed.intervals.length === 0) {
-    return fail(Array.isArray(payload) && payload.length === 0 ? "not_published" : "invalid_payload");
+    return fail(classifyEmptyPayload(payload));
   }
 
   if (parsed.droppedRecords > 0 || parsed.gaps > 0 || parsed.overlaps > 0) {
