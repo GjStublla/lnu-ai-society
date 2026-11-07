@@ -9,6 +9,13 @@
 
 The initial shell has one link to public API documentation; it does not claim to have verified a promotional opportunity. No live-price request, authenticated model call or Supabase connection was tested by bootstrap. These references are technical integration evidence, not proof of personal savings or partner agreements.
 
+## Coach implementation references (checked 2026-11-07)
+- Groq chat-completions endpoint, model/response format/token parameters: https://console.groq.com/docs/api-reference
+- Both requested models support strict JSON schema; model output is still validated and reduced to a reviewed topic selection: https://console.groq.com/docs/structured-outputs
+- Model listing is available through authenticated GET `/openai/v1/models`; a listing is not proof of generation permissions or quota: https://console.groq.com/docs/models
+- Groq limits can apply at organization level; the route does not retry 401/429 on a second model. Gjin must check actual account limits and spending controls: https://console.groq.com/docs/rate-limits
+- Factual text follows the product's tariff/participation constraints and the public Elprisetjustnu price documentation above. No invented numeric price window, impact or merchant evidence is generated. See `docs/AI_INTEGRATION.md` for the deliberately constrained AI-selection boundary.
+
 - Swedish 15-minute spot price API, SE1-SE4, upstream schema and spot-price caveats: https://www.elprisetjustnu.se/elpris-api
 - Official Groq supported models (check availability and preview status at runtime): https://console.groq.com/docs/models
 - Groq API compatibility: https://console.groq.com/docs/openai

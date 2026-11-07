@@ -18,6 +18,7 @@
 8. Keep a fallback screen and a short recorded demo if the live API or network becomes unavailable, but don't misrepresent cached data as live.
 
 ## Groq setup after the coach PR
+The coach implementation/setup and frontend contract are documented in `docs/AI_INTEGRATION.md`. `npm run check:groq` provides an explicit read-only authenticated model listing check without printing credentials or generating a completion. The no-key route works immediately; leave the key absent until intended public access and account spending controls are configured.
 Privately create a key in the Groq console. The public model list checked 2026-11-07 includes `qwen/qwen3.8-27b` as preview and `openai/gpt-oss-20b` as production. This does **not** verify your account permissions or free quota. Verify both IDs in your console or authenticated `GET https://api.groq.com/openai/v1/models` on your machine; do not paste the key or headers into chat. Keep the requested preferred ID configurable. If it is inaccessible, the coach must try the configured provider fallback, then explicitly labeled deterministic guidance. Check account rate/spend limits. Bootstrap makes no paid requests.
 
 ## Supabase setup after Alex's PR

@@ -14,7 +14,7 @@ cd lnu-ai-society
 npm ci
 ```
 
-Use Node 24 LTS (`.nvmrc`). No keys or `.env.local` are required. After switching to your branch, run `npm run dev` and open http://localhost:3000. Stop dev with Ctrl+C when done. The initial API paths are contracts only and return 404 until owners merge implementations.
+Use Node 24 LTS (`.nvmrc`). No keys or `.env.local` are required. After switching to your branch, run `npm run dev` and open http://localhost:3000. Stop dev with Ctrl+C when done. `/api/coach` is implemented on Gjin's AI branch; its handoff is `docs/AI_INTEGRATION.md`. Other API paths return 404 until their owners' implementations merge. Fetch/merge main regularly to pick up reviewed features.
 
 Switch to your assigned prepared branch (Bleron, Alex and Ignes):
 ```bash
