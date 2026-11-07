@@ -1,0 +1,33 @@
+import { getCurrentOpportunities } from "@/lib/energy/opportunities";
+import { DEFAULT_REGION, REGION_ERROR_MESSAGE, parseRegion } from "@/lib/energy/regions";
+import type { OpportunitiesResponse } from "@/types/contracts";
+
+// Curated server data; keep it dynamic so the response timestamp is real.
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+function json(body: unknown, status = 200): Response {
+  return Response.json(body, {
+    status,
+    headers: { "Cache-Control": "no-store" },
+  });
+}
+
+/**
+ * GET /api/opportunities?region=SE4
+ *
+ * Returns only sourced, verified public notices. An empty list is a valid
+ * result and should be shown as "no verified offers right now" rather than
+ * filled with an invented deal. Expired notices are filtered out.
+ */
+export async function GET(request: Request): Promise<Response> {
+  const rawRegion = new URL(request.url).searchParams.get("region");
+  const region = rawRegion === null ? DEFAULT_REGION : parseRegion(rawRegion);
+  if (!region) return json({ error: REGION_ERROR_MESSAGE }, 400);
+
+  const response: OpportunitiesResponse = {
+    opportunities: getCurrentOpportunities(new Date()),
+    updatedAt: new Date().toISOString(),
+  };
+  return json(response);
+}
