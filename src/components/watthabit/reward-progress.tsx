@@ -126,7 +126,7 @@ export function RewardHero({ progress, goal, exampleStamps, dropKey, celebrateKe
   const full = progress >= goal;
   return (
     <div className="flex flex-col items-center rounded-[26px] border border-border bg-card px-5 pt-6 pb-5 text-center">
-      <div className="relative w-36">
+      <div className="relative w-36 md:w-56">
         <Mug progress={progress} goal={goal} />
         <StampDrop dropKey={dropKey} />
         <Celebration celebrateKey={celebrateKey} />

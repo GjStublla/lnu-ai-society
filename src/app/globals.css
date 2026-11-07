@@ -134,6 +134,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
 .app-section + .app-section { margin-top: 16px; }
 .wallet-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
 .wallet-layout > * { min-width: 0; }
+.challenge-grid, .radar-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .app-navigation { position: fixed; inset-inline: 0; bottom: 0; z-index: 30; border-top: 1px solid var(--border); background: var(--card); padding-bottom: env(safe-area-inset-bottom); }
 
 @media (min-width: 768px) {
@@ -142,8 +143,12 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
   .reward-focus-mug { margin-block: -26px -14px; }
   .reward-focus-progress { margin-top: auto; }
   .wallet-layout { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
-  .wallet-layout > :first-child { grid-row: span 3; }
-  .wallet-layout > :last-child { grid-column: 2; }
+  /* The mug card fills the whole left column so both columns end together. */
+  .wallet-layout > :first-child { grid-row: 1 / span 4; align-self: stretch; justify-content: center; }
+  .wallet-layout > :not(:first-child) { grid-column: 2; }
+  /* Two-up cards on wider screens instead of full-width stretched rows. */
+  .challenge-grid, .radar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .radar-grid > :not(article) { grid-column: 1 / -1; }
   .app-navigation { inset-inline: max(24px, calc((100% - 580px) / 2)); bottom: 20px; border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; box-shadow: 0 8px 30px oklch(0.3 0.025 145 / 0.09); }
 }
 

@@ -14,7 +14,7 @@ const fmt = (iso: string) => {
 
 export function Radar({ state }: { state: RadarState }) {
   return (
-    <div className="space-y-3">
+    <div className="radar-grid">
       {state.kind === "loading" && <div className="h-36 animate-pulse rounded-[22px] border border-border bg-card" aria-hidden="true" />}
 
       {state.kind === "ready" && state.fallback && (
@@ -31,7 +31,7 @@ export function Radar({ state }: { state: RadarState }) {
         state.items.map((o) => {
           const verified = o.verified && !o.demo;
           return (
-            <article key={o.id} className="rounded-[22px] border border-border bg-card p-4" aria-labelledby={`opp-${o.id}`}>
+            <article key={o.id} className="flex flex-col rounded-[22px] border border-border bg-card p-4" aria-labelledby={`opp-${o.id}`}>
               <div className="flex items-center gap-2">
                 {verified ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground">
@@ -52,8 +52,8 @@ export function Radar({ state }: { state: RadarState }) {
               <h3 id={`opp-${o.id}`} className="mt-1 text-[15px] leading-snug font-semibold">
                 {o.title}
               </h3>
-              <p className="mt-1 text-xs text-muted-foreground">Published {fmt(o.publishedAt)}</p>
-              <a href={o.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-primary underline-offset-4 hover:underline">
+              <p className="mt-1 mb-1 text-xs text-muted-foreground">Published {fmt(o.publishedAt)}</p>
+              <a href={o.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex min-h-11 self-start items-center gap-1 text-sm font-semibold text-primary underline-offset-4 hover:underline">
                 View source <ArrowUpRight className="size-4" aria-hidden="true" />
                 <span className="sr-only">(opens in a new tab)</span>
               </a>
