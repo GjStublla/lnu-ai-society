@@ -29,9 +29,9 @@ const habit = (id: HabitChallenge["id"], title: string, line: string, watts: num
 });
 
 export const HABITS: HabitChallenge[] = [
-  habit("standby-30w", "Switch off a standby load", "Turn off a ~30 W device left on standby — TV box, speaker or monitor.", 30, 10, "it would otherwise stay on", "How much does a 30 W standby load use?"),
-  habit("computer-sleep-60w", "Put your computer to sleep", "Let an unused ~60 W desktop and screen sleep instead of idling.", 60, 8, "it would otherwise idle", "Does putting my computer to sleep save kWh?"),
-  habit("lights-15w", "Lights off when you leave", "Switch off ~15 W of lighting in a room you're not using.", 15, 4, "they would otherwise stay on", "Do small lights really matter?"),
+  habit("standby-30w", "Kill standby", "Turn off a ~30 W device left on standby — TV box, speaker or monitor.", 30, 10, "it would otherwise stay on", "How much does a 30 W standby load use?"),
+  habit("computer-sleep-60w", "Sleep your computer", "Let an unused ~60 W desktop and screen sleep instead of idling.", 60, 8, "it would otherwise idle", "Does putting my computer to sleep save kWh?"),
+  habit("lights-15w", "Lights off", "Switch off ~15 W of lighting in a room you're not using.", 15, 4, "they would otherwise stay on", "Do small lights really matter?"),
 ];
 
 export const LEARN_CHALLENGE = {

@@ -220,19 +220,16 @@ export function WattHabitApp() {
     {
       id: PRICE_CHALLENGE_ID,
       kind: "price",
-      title: `Daily price challenge · ${label.name}`,
-      line: usefulPlan
-        ? `Run planned ${label.noun} in ${priceTomorrow ? "tomorrow's" : "today's"} happy hour, ${windowText(usefulPlan.plan)}.`
-        : `Run planned ${label.noun} in a cheaper window when there is one.`,
-      estimateLabel: "Estimate",
-      estimate: usefulPlan
-        ? `≈ ${usefulPlan.plan.estimatedDiffSek.toFixed(2)} SEK lower spot cost per ${label.unit} (assumes ~${ASSUMED_KWH} kWh, before VAT and fees). Shifting doesn't reduce kWh.`
+      title: `${label.name} happy hour`,
+      metric: usefulPlan ? `${windowText(usefulPlan.plan)} · ≈ −${usefulPlan.plan.estimatedDiffSek.toFixed(2)} SEK est.` : "No window yet",
+      info: usefulPlan
+        ? `Run planned ${label.noun} in ${priceTomorrow ? "tomorrow's" : "today's"} cheapest window. Estimate assumes ~${ASSUMED_KWH} kWh per ${label.unit}, spot price only, before VAT and fees. Shifting doesn't reduce kWh; savings depend on your contract.`
         : "Shifting changes when you use energy, not how much. Savings depend on your contract.",
       accepted: isAccepted(PRICE_CHALLENGE_ID),
       done: isDone(PRICE_CHALLENGE_ID),
       canAccept: usefulPlan !== null,
       canComplete: usefulPlan !== null && !priceTomorrow,
-      note: !usefulPlan ? (loaded ? "No clear happy hour left today." : "Checking prices…") : priceTomorrow ? "The happy hour is tomorrow — stamp it then." : null,
+      note: !usefulPlan ? (loaded ? "No happy hour left today" : "Checking prices…") : priceTomorrow ? "Stamp it tomorrow" : null,
       acceptedNote: usefulPlan ? `Reminder set for ${priceTomorrow ? "tomorrow " : ""}${usefulPlan.reminderAt}` : "Accepted",
     },
     ...HABITS.map(
@@ -240,9 +237,8 @@ export function WattHabitApp() {
         id: h.id,
         kind: "habit",
         title: h.title,
-        line: h.line,
-        estimateLabel: "Modeled estimate",
-        estimate: `≈ ${h.kwhPerDay.toFixed(2)} kWh less per day (${h.assumption}). Self-reported, not measured.`,
+        metric: `${h.watts} W · −${h.kwhPerDay.toFixed(2)} kWh/day est.`,
+        info: `${h.line} Modeled estimate: ${h.assumption}. Self-reported, not measured.`,
         accepted: isAccepted(h.id),
         done: isDone(h.id),
         canAccept: true,
@@ -255,9 +251,8 @@ export function WattHabitApp() {
       id: LEARN_CHALLENGE.id,
       kind: "learn",
       title: LEARN_CHALLENGE.title,
-      line: LEARN_CHALLENGE.line,
-      estimateLabel: "Why it matters",
-      estimate: "A cheaper hour lowers the price per kWh, not the kWh you use.",
+      metric: "20-sec read",
+      info: "A cheaper hour lowers the price per kWh, not the kWh you use.",
       accepted: isAccepted(LEARN_CHALLENGE.id),
       done: isDone(LEARN_CHALLENGE.id),
       canAccept: true,
@@ -467,7 +462,7 @@ export function WattHabitApp() {
 
         {/* CHALLENGES */}
         <section id="challenges" aria-labelledby="challenges-title" className="scroll-mt-16 pt-10">
-          <SectionHeading id="challenges-title" title="Challenges" sub="Small, self-reported actions. Accept, do it, stamp it." />
+          <SectionHeading id="challenges-title" title="Challenges" />
           <ChallengesSection
             cards={cards}
             streak={streak}
@@ -495,7 +490,7 @@ export function WattHabitApp() {
 
         {/* REWARDS */}
         <section id="rewards" aria-labelledby="rewards-title" className="scroll-mt-16 pt-10">
-          <SectionHeading id="rewards-title" title="Rewards" sub="Complete challenges to fill the cup. Digital rewards are free." />
+          <SectionHeading id="rewards-title" title="Rewards" />
           <div className="space-y-3">
             <RewardHero progress={demo.progress} goal={demo.goal} exampleStamps={Math.min(DEMO_EXAMPLE_STAMPS, demo.progress)} dropKey={dropKey} celebrateKey={celebrateKey} />
             <BadgesRow earned={earnedBadges} />
@@ -521,7 +516,8 @@ export function WattHabitApp() {
 
         <footer className="mt-12 border-t border-border pt-6 text-[11px] leading-relaxed text-muted-foreground">
           <p className="text-sm font-bold text-foreground">WattHabit</p>
-          <p className="mt-2">Stamps reflect participation, not verified electricity savings.</p>
+          <p className="mt-2">Stamps reflect self-reported participation, not measured or verified electricity savings.</p>
+          <p className="mt-1">Estimates (est.) are modeled with stated assumptions. Shifting changes when you use energy, not how many kWh.</p>
           <p className="mt-1">Spot prices exclude VAT, taxes, grid fees and retailer margins. Your tariff decides whether shifting saves money.</p>
           <p className="mt-1">Made for student life in Sweden.</p>
         </footer>
@@ -614,13 +610,13 @@ export function WattHabitApp() {
   );
 }
 
-function SectionHeading({ id, title, sub }: { id: string; title: string; sub: string }) {
+function SectionHeading({ id, title, sub }: { id: string; title: string; sub?: string }) {
   return (
     <div className="mb-3">
       <h2 id={id} className="text-[22px] font-semibold tracking-tight">
         {title}
       </h2>
-      <p className="mt-0.5 text-sm text-muted-foreground">{sub}</p>
+      {sub && <p className="mt-0.5 text-sm text-muted-foreground">{sub}</p>}
     </div>
   );
 }
